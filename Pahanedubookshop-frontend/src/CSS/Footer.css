@@ -1,0 +1,144 @@
+.footer {
+    background-image: url('../Image/footer.jpg');
+    background-size: cover;
+    background-position: center;
+    block-size: 350px;
+    color: #fff;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    font-family: 'Inria Sans', sans-serif;
+}
+
+.footer-logo {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-logo img {
+    max-inline-size: 200px;
+    block-size: auto;
+}
+
+
+.footer-nav {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 2px;
+}
+
+.footer-nav .foot-head {
+    margin-block-end: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.footer-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+}
+
+.footer-nav li {
+    margin: 0;
+}
+
+.footer-nav a {
+    color: #fff;
+    text-decoration: none;
+    display: block;
+    padding: 5px 0;
+}
+
+.footer-nav a:hover {
+    color: #A69003;
+}
+
+.footer-social {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.footer-social .foot-head {
+    margin-block-end: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.footer-social a {
+    color: #fff;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+}
+
+.footer-social a i {
+    font-size: 2em;
+    margin-inline-end: 12px;
+}
+
+.footer-social a:hover {
+    color: #A69003;
+}
+
+.footer-contact {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.footer-contact .foot-head {
+    margin-block-end: 10px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.footer-contact p {
+    margin: 0;
+    line-height: 1.5;
+    text-align: center;
+    margin-block-start: 20px;
+    font-size: 14px;
+}
+
+
+
+
+
+
+
+
+.footer-copyright {
+    text-align: center;
+    padding: 20px 0;
+    font-size: 14px;
+    color: #fff;
+    inset-block-end:0;
+    inline-size: 100%;
+}
+
+
+.footer .nav-link.active-link {
+    color: #A69003 !important;
+    font-weight: bold;
+}
+
+.footer .nav-link.active-link:hover {
+    color: white !important;
+    
+}

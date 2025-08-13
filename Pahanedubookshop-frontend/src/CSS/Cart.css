@@ -1,0 +1,405 @@
+.cart-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 25px;
+    margin: 50px;
+    font-family: 'Inria Sans', sans-serif;
+    color: white;
+    margin-left: 40px;
+    margin-right: 40px;
+}
+
+.total-amount {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-right: 25px;
+}
+
+.btn-btn-warning {
+    font-size: 1rem;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 180px;
+    height: 50px;
+    margin: 10px;
+    background-color: #A69003;
+    color: white;
+    border: none;
+}
+
+.btn-btn-danger-me-2 {
+    font-size: 1rem;
+    padding: 5px 15px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 180px;
+    height: 50px;
+    margin: 10px;
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+.btn-btn-danger-me-2:hover {
+    background-color: rgb(152, 0, 0);
+    color: white;
+}
+
+.btn-btn-warning:hover {
+    background-color: #706102;
+    color: white;
+}
+
+.large-icon {
+    font-size: 2rem;
+}
+
+.fs-3 {
+    font-size: 1.75rem;
+}
+
+
+
+
+/* Updated Card Styles */
+
+
+
+.card-custom-card {
+    display: flex;
+    flex-direction: row;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    overflow: hidden;
+    width: 100%;
+    font-family: 'Inria Sans', sans-serif;
+    height: 190px;
+    background-color: #d6d6d6;
+    align-items: center;
+    animation: fadeInUp 1s ease-in-out;
+    
+}
+
+.card-img {
+    flex: 0 0 170px;
+    height: 170px;
+    object-fit: cover;
+    text-align: left;
+    border-radius: 10px;
+    margin-left: 10px;
+}
+
+.card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 15px;
+    text-align: left;
+}
+
+.card-product-info {
+    margin-bottom: 10px;
+    padding-top: 10px;
+    
+}
+
+.card-product-name {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.card-product-description {
+    font-size: 0.8rem;
+    margin-bottom: 5px;
+}
+
+.card-product-quantity {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.card-product-subtotal {
+    font-size: 1.3rem;
+    font-weight: bold;
+    text-align: right;
+    margin: 0;
+}
+
+.card-clear-btn {
+    background-color: transparent;
+    color: red;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+    align-self: flex-start;
+    align-items: right;
+}
+
+.card-clear-btn:hover {
+    color: rgb(147, 0, 0);
+}
+
+.cart-items-container {
+    margin: 20px auto;
+    padding: 0;
+    padding-inline-start: 70px;
+    padding-inline: 70px;
+}
+
+@media (max-width: 768px) {
+    .card-custom-card {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .card-img {
+        width: 100%;
+        height: auto;
+    }
+
+    .card-body {
+        padding: 10px;
+    }
+
+    .card-product-subtotal {
+        text-align: left;
+    }
+}
+
+
+
+
+
+/* Blurred background style */
+.modal-backdrop-blur {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    z-index: 1040;
+  }
+  
+ 
+  .modal.show .modal-dialog {
+    max-width: 500px;
+    margin: 1.75rem auto;
+    z-index: 1050;
+  }
+  
+  .modal.show .modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: black;
+    color: white;
+    border: 0.1px solid #A69003;
+  }
+  
+  .modal.show .modal-header {
+    background-color: black;
+    border-bottom: 0.1px solid black;
+    color: #A69003;
+  }
+  
+  .modal.show .modal-title {
+    color: #A69003;
+  }
+  
+  .modal.show .modal-body {
+    padding: 1.5rem;
+    font-size: 1rem;
+    color: white;
+  }
+  
+  .modal.show .modal-footer {
+    border-top: 1px solid black;
+    padding: 0.75rem;
+    background-color: black;
+  }
+
+  .modal.show .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: #A69003;
+  }
+  
+  .modal.show .btn-secondary {
+    background-color: white;
+    color: black;
+    width: 140px;
+    border-color: white;
+  }
+  
+  .modal.show .btn-danger {
+    background-color: #A69003;
+    color: white;
+    width: 140px;
+    border-color: #A69003;
+  }
+  
+  .modal.show .btn:hover {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+  }
+  
+
+
+
+
+
+
+
+
+
+
+  .checkout-container {
+    margin-left: 120px;
+    margin-right: 120px;
+
+  }
+  
+  .checkout-item {
+    font-size: 16px;
+    color: rgb(161, 161, 161);
+    font-family: 'Inria Sans', sans-serif;
+  }
+  
+  .checkout-total {
+    font-size: 20px;
+    color: white;
+    font-family: 'Inria Sans', sans-serif;
+    margin-top: 50px;
+    margin-bottom: 120px;
+  }
+  .checkout-final-total{
+    font-size: 20px;
+    color: #A69003;
+    font-family: 'Inria Sans', sans-serif;
+    margin-top: 50px;
+    margin-bottom: 120px;
+  }
+
+
+
+
+
+
+
+
+
+  
+  .purchases-container {
+    margin-top: 20px;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    animation: fadeInUp 1s ease-in-out;
+  }
+  
+  .order-card {
+    width: 100%;
+    max-width: 1700px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #d6d6d6;
+    font-family: 'Inria Sans', sans-serif;
+
+  }
+  .order-id{
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .order-info {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+  
+  .order-details {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+  }
+  
+  .order-items {
+    display: flex;
+    flex-direction: row;
+    text-align: right;
+    font-style: italic;
+  }
+  
+
+
+  .order-summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    text-align: right;
+    font-family: 'Inria Sans', sans-serif;
+  }
+  
+  .order-summary .order-text {
+    margin-right: 40px;
+    font-weight: bold;
+    font-size: 20px;
+  }
+  .order-status {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 40px;
+    text-align: center;
+    border-radius: 10px;
+    color: white;
+  }
+  
+  .order-status.pending {
+    background-color: yellow;
+    color: black;
+  }
+  
+  .order-status.accepted {
+    background-color: rgb(1, 255, 1);
+    color: black;
+  }
+  
+  .order-status.denied {
+    background-color: red;
+  }
+  .order-id {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  
+  .btn-download-receipt {
+    position: absolute;
+    right: -20px; 
+    background-color: transparent;
+    border: none;
+    color: #4125f7;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  
+  .btn-download-receipt:hover {
+    color: #4125f7;
+  }
+  

@@ -1,0 +1,255 @@
+@import url('https://fonts.googleapis.com/css2?family=Inria+Sans:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kaushan+Script&display=swap');
+
+body {
+    margin: 0;
+    padding: 0;
+    color: #111111;
+}
+
+.index-container {
+    background-image: url('../Image/background2.jpg');
+    background-size: cover;
+    background-position: center;
+    min-block-size: 100vh;
+    color: white;
+    animation: fadeIn 1s ease-in-out;
+}
+
+.authentic-taste {
+    font-size: 96px;
+    text-align: center;
+    margin-block: 20px;
+    font-family: 'Kaushan Script', cursive;
+    animation: fadeInUp 2s ease-in-out;
+}
+
+
+
+.authentic-taste .authentic {
+    color: white !important;
+}
+
+.authentic-taste .taste {
+    color: #A69003 !important;
+}
+.subHeading{
+    font-family: 'Inria Sans', sans-serif;
+    font-size: 24px;
+    margin-inline-start:45px;
+    margin-block-start:150px;
+    animation: fadeInUp 2s ease-in-out;
+}
+
+.button-container {
+    display: flex;
+    gap: 24px;
+    margin-block-start: 45px;
+    margin-inline-start:50px;
+    animation: fadeInUp 2s ease-in-out;
+}
+
+.btn-transparent-sub, .btn-gold-sub {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    inline-size: 174px;
+    block-size: 72px;
+    cursor: pointer;
+    transition-duration: 0.4s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.btn-transparent-sub {
+    background-color: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-transparent-sub:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.btn-gold-sub {
+    background-color: #A69003;
+    color: white;
+    border: none;
+}
+
+.btn-gold-sub:hover {
+    background-color: #686868;
+    color: black;
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+
+
+
+
+
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+.mid-container {
+    background-image: url('../Image/mid1.png');
+    background-size: cover;
+    background-position: center;
+    min-block-size: 70vh;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    padding: 120px;
+    margin:  100px 100px 0 100px;
+    box-sizing: border-box;
+    position: relative;
+    border-radius: 15px;
+    animation: fadeInUp 4s ease-in-out;
+}
+
+.mid-container img {
+    max-inline-size: 100%;
+    max-inline-size: 100%;
+    margin: 0 auto;
+    border: 5px solid white;
+}
+
+.mid-head {
+    font-size: 40px;
+    text-align: start;
+    margin-block-end: 20px;
+    position: absolute;
+    inset-block-start: 20px;
+    inset-inline-start: 40px;
+    z-index: 10;
+    padding: 10px;
+    padding-inline-start: 100px;
+    color: #A69003;
+    font-weight: bold;
+    font-family: 'Inria Sans', sans-serif;
+}
+.mid-para {
+    color: black;
+    font-family: 'Inria Sans', sans-serif;
+    font-size: 15px;
+    padding: 10px;
+    line-height: 3.0;
+    text-align: start;
+    margin-block-end: 20px;
+    inset-inline-start: 40px;
+    z-index: 10;
+}
+
+
+
+
+
+
+
+.form-control {
+    background-color: transparent;
+    border: 2px solid white;
+    color: white;
+    padding: 10px;
+    border-radius: 0;
+}
+
+.col-form-label {
+    color: white;
+}
+
+.btn-primary-submit {
+    background-color: #A69003;
+    border: none;
+    inline-size: 194px;
+    block-size: 46px;
+    display: block;
+    margin: 0 auto;
+    margin-block-start: 40px;
+    color: white;
+    transition-duration: 0.4s;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.btn-primary-submit:hover {
+    background-color: #e8c900;
+    color: white;
+    opacity: 0.8;
+    transform: scale(1.1);
+}
+
+.form-control:focus {
+    background-color: transparent;
+    box-shadow: none;
+    border-color: #A69003;
+    color: white;
+    font-family: 'Inria Sans', sans-serif;
+}
+.form-control::placeholder {
+    color: rgb(80, 79, 79);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-block-size: 100vh;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+form {
+    inline-size: 100%;
+    max-inline-size: 1000px;
+    padding: 20px;
+    background-color: transparent;
+    font-family: 'Inria Sans', sans-serif;
+}
+.form-head{
+    font-family: 'Inria Sans', sans-serif;
+    color: #A69003;
+    margin-block-end: 60px;
+}
+
+
+
+
+

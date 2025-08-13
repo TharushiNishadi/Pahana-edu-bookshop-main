@@ -1,0 +1,97 @@
+@import url('https://fonts.googleapis.com/css2?family=Inria+Sans:wght@400;700&display=swap');
+
+body {
+    margin: 0;
+    
+}
+.main{
+    animation: fadeInUp 1s ease-in-out;
+}
+.menu-container {
+    background-image: url('../Image/wood.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    animation: fadeInUp 1s ease-in-out;
+}
+
+.menu-header {
+    margin-block-end: 40px;
+    font-family: 'Kaushan Script', cursive;
+}
+
+.menu-heading {
+    font-size: 64px;
+    font-weight: bold;
+}
+
+.menu-heading-tasty {
+    color: white;
+}
+
+.menu-heading-dishes {
+    color: #a69003;
+}
+
+.product-list {
+    margin-block-start: 20px;
+    margin-inline-end: 100px;
+    margin-inline-start: 100px;
+    padding: 0 20px;
+    color: white;
+    font-family:'Inria Sans', sans-serif;
+    margin-bottom: 50px;
+}
+
+.category-header {
+    font-size: 32px;
+    font-weight: bold;
+    margin-block-start: 20px;
+    border-block-end: 2px solid white;
+    padding-block-end: 10px;
+}
+
+.product-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    padding: 10px 0;
+    margin-block-end: 10px;
+    inline-size: 100%;
+}
+
+.product-name {
+    text-align: start;
+}
+
+.product-price {
+    text-align: end;
+    white-space: nowrap;
+}
+
+.dotted-line {
+    flex-grow: 1;
+    border-block-end: 2px dotted white;
+    margin: 0  50px;
+}
+
+.category-name{
+    color:#A69003 ;
+    font-family:'Inria Sans', sans-serif;
+    padding-inline-start: 100px;
+    padding-block-start: 40px;
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

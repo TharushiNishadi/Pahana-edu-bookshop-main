@@ -1,0 +1,265 @@
+.change-profile-container {
+  margin: 0 auto;
+  padding: 20px;
+  text-align: center;
+  max-width: 900px;
+}
+
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.profile-picture {
+  text-align: center;
+}
+
+.img-thumbnail {
+  width: 200px;
+  height: 200px;
+  border-radius:50%;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border: 0;
+}
+
+
+.form-head-one {
+  margin-bottom: 20px;
+}
+
+.btn {
+  margin-top: 20px;
+}
+
+.invalid-feedback {
+  display: block;
+}
+
+.file-input-button {
+  border: 1px solid #A69003;
+  border-radius: 4px;
+  background-color: #000000;
+  color: white;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  text-align: center;
+  display: inline-block;
+}
+
+
+.file-input-button input[type="file"] {
+  display: none;
+}
+
+.form-control[readonly] {
+  color: #484f54;
+  cursor: not-allowed;
+}
+
+
+
+
+
+
+
+
+
+.custom-table {
+  width: 100%;
+  background-color: transparent;
+  margin-right: 20px;
+  margin-top: 50px;
+  border-radius: 10px;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.custom-table th,
+.custom-table td {
+  border: 0.15px solid #a6900357;
+  padding: 10px;
+  color: white;
+  text-align: center;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.custom-table th {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-confirm {
+  background-color: #A69003;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-deny {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  margin-left: 10px;
+  margin-top: 10px;
+}
+
+.btn-deny:hover {
+  background-color: darkred;
+}
+
+.btn-confirm:hover {
+  background-color: #5f5201;
+}
+
+.sub-par{
+  color: white;
+  text-align: left;
+  margin-bottom: -30px;
+  margin-top: 20px;
+}
+
+.btn-submit {
+  background-color: #A69003;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-submit:hover {
+  background-color: #5f5201;
+  transform: scale(1.05);
+}
+
+.btn-submit:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(184, 145, 1, 0.5);
+}
+
+
+
+
+
+.user-table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-left: 50px;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+.profile-pic-user{
+  width: 150px;
+  height: 150px;
+}
+.product-pic-admin{
+  width: 200px;
+  height: 150px;
+}
+
+.btn-gold-add {
+  background-color: #A69003;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  transition-duration: 0.4s;
+  inline-size: 145px;
+ margin-top:10px;
+}
+
+.add-user-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: transparent;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.full-height-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: transparent;
+}
+
+
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-container-one {
+  flex: 1;
+}
+
+.search-input {
+  width: 100%;
+}
+
+.button-container {
+  margin-left: auto;
+}
+
+
+
+
+/* Container for image preview */
+.image-preview-container {
+  position: relative;
+  display: inline-block;
+}
+
+
+.custom-file-upload {
+  cursor: pointer;
+  padding: 6px 12px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  background-color: #fff;
+  display: inline-block;
+  color: #000000;
+}
+
+.image-preview {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  overflow: hidden;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
