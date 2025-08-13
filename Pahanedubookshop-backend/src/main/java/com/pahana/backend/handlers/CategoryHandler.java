@@ -19,6 +19,7 @@ import java.util.logging.Level;
 public class CategoryHandler implements HttpHandler {
     private static final Logger LOGGER = Logger.getLogger(CategoryHandler.class.getName());
 
+    
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
