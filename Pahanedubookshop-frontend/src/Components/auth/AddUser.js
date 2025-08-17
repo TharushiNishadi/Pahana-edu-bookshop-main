@@ -70,17 +70,26 @@ const AddUser = () => {
 
     if (validateForm()) {
       setLoading(true);
+      
+      // Log the form data being sent
+      console.log('=== SUBMITTING USER FORM ===');
+      console.log('Form data:', formData);
+      
+      const userData = {
+        username: formData.username,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        password: formData.password,
+        userType: formData.userType,
+        profilePicture: formData.profilePicture,
+      };
+      
+      console.log('Data being sent to backend:', userData);
 
       axios
-        .post('/user/userAdd', {
-          username: formData.username,
-          userEmail: formData.email,
-          phoneNumber: formData.phoneNumber,
-          password: formData.password,
-          userType: formData.userType,
-          profilePicture: formData.profilePicture,
-        })
+        .post('/users', userData)
         .then(response => {
+          console.log('User created successfully:', response.data);
           Swal.fire({
             title: 'Success!',
             text: 'User added successfully!',
@@ -101,18 +110,24 @@ const AddUser = () => {
         })
         .catch(error => {
           console.error('Error adding user:', error);
-          const errorMsg = error.response?.data?.message || 'Failed to add user';
+          console.error('Error response:', error.response?.data);
+          console.error('Error status:', error.response?.status);
+          console.error('Error message:', error.message);
+          
+          const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to add user';
           Swal.fire({
             title: 'Error!',
             text: errorMsg,
             icon: 'error',
-            timer: 2500,
-            showConfirmButton: false
+            timer: 5000,
+            showConfirmButton: true
           });
         })
         .finally(() => {
           setLoading(false);
         });
+    } else {
+      console.log('Form validation failed:', errors);
     }
   };
 
@@ -260,7 +275,9 @@ const AddUser = () => {
             {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
             {success && <div className="alert alert-success">{success}</div>}
 
-            <button type="submit" className="btn btn-primary-submit">Add User</button>
+            <button type="submit" className="btn btn-primary-submit" disabled={loading}>
+              {loading ? 'Adding User...' : 'Add User'}
+            </button>
           </form>
         )}
       </div>

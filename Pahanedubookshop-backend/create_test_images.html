@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Test Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .image-container { margin: 20px 0; }
+        canvas { border: 1px solid #ccc; margin: 10px; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>Create Test Images for Pahana Bookshop</h1>
+    <p>This tool will create placeholder images for testing the image display functionality.</p>
+    
+    <div class="image-container">
+        <h3>Category Images</h3>
+        <button onclick="createImage('fiction.jpg', 'Fiction Books', '#ff6b6b')">Create fiction.jpg</button>
+        <button onclick="createImage('non-fiction.jpg', 'Non-Fiction Books', '#4ecdc4')">Create non-fiction.jpg</button>
+        <button onclick="createImage('academic.jpg', 'Academic Books', '#45b7d1')">Create academic.jpg</button>
+        <button onclick="createImage('children.jpg', 'Children Books', '#96ceb4')">Create children.jpg</button>
+    </div>
+    
+    <div class="image-container">
+        <h3>Product Images</h3>
+        <button onclick="createImage('book1.jpg', 'Sample Book 1', '#feca57')">Create book1.jpg</button>
+        <button onclick="createImage('book2.jpg', 'Sample Book 2', '#ff9ff3')">Create book2.jpg</button>
+        <button onclick="createImage('book3.jpg', 'Sample Book 3', '#54a0ff')">Create book3.jpg</button>
+        <button onclick="createImage('book4.jpg', 'Sample Book 4', '#5f27cd')">Create book4.jpg</button>
+    </div>
+    
+    <div class="image-container">
+        <h3>Gallery Images</h3>
+        <button onclick="createImage('fiction-gallery.jpg', 'Fiction Gallery', '#ff6b6b')">Create fiction-gallery.jpg</button>
+        <button onclick="createImage('non-fiction-gallery.jpg', 'Non-Fiction Gallery', '#4ecdc4')">Create non-fiction-gallery.jpg</button>
+        <button onclick="createImage('academic-gallery.jpg', 'Academic Gallery', '#45b7d1')">Create academic-gallery.jpg</button>
+        <button onclick="createImage('children-gallery.jpg', 'Children Gallery', '#96ceb4')">Create children-gallery.jpg</button>
+    </div>
+    
+    <div class="image-container">
+        <h3>Other Images</h3>
+        <button onclick="createImage('default.jpg', 'Default Profile', '#95a5a6')">Create default.jpg</button>
+        <button onclick="createImage('summer_sale.jpg', 'Summer Sale', '#e74c3c')">Create summer_sale.jpg</button>
+        <button onclick="createImage('student_discount.jpg', 'Student Discount', '#3498db')">Create student_discount.jpg</button>
+        <button onclick="createImage('new_year.jpg', 'New Year Special', '#f39c12')">Create new_year.jpg</button>
+    </div>
+    
+    <div class="image-container">
+        <h3>Create All Images</h3>
+        <button onclick="createAllImages()" style="background: #28a745;">Create All Images</button>
+    </div>
+    
+    <div id="status"></div>
+
+    <script>
+        function createImage(filename, text, color) {
+            const canvas = document.createElement('canvas');
+            canvas.width = 300;
+            canvas.height = 200;
+            const ctx = canvas.getContext('2d');
+            
+            // Fill background
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, 300, 200);
+            
+            // Add text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(text, 150, 100);
+            
+            // Add filename
+            ctx.font = '16px Arial';
+            ctx.fillText(filename, 150, 140);
+            
+            // Convert to blob and download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                document.getElementById('status').innerHTML = `<p style="color: green;">✓ Created ${filename}</p>`;
+            }, 'image/jpeg', 0.8);
+        }
+        
+        function createAllImages() {
+            const images = [
+                { filename: 'fiction.jpg', text: 'Fiction Books', color: '#ff6b6b' },
+                { filename: 'non-fiction.jpg', text: 'Non-Fiction Books', color: '#4ecdc4' },
+                { filename: 'academic.jpg', text: 'Academic Books', color: '#45b7d1' },
+                { filename: 'children.jpg', text: 'Children Books', color: '#96ceb4' },
+                { filename: 'book1.jpg', text: 'Sample Book 1', color: '#feca57' },
+                { filename: 'book2.jpg', text: 'Sample Book 2', color: '#ff9ff3' },
+                { filename: 'book3.jpg', text: 'Sample Book 3', color: '#54a0ff' },
+                { filename: 'book4.jpg', text: 'Sample Book 4', color: '#5f27cd' },
+                { filename: 'fiction-gallery.jpg', text: 'Fiction Gallery', color: '#ff6b6b' },
+                { filename: 'non-fiction-gallery.jpg', text: 'Non-Fiction Gallery', color: '#4ecdc4' },
+                { filename: 'academic-gallery.jpg', text: 'Academic Gallery', color: '#45b7d1' },
+                { filename: 'children-gallery.jpg', text: 'Children Gallery', color: '#96ceb4' },
+                { filename: 'default.jpg', text: 'Default Profile', color: '#95a5a6' },
+                { filename: 'summer_sale.jpg', text: 'Summer Sale', color: '#e74c3c' },
+                { filename: 'student_discount.jpg', text: 'Student Discount', color: '#3498db' },
+                { filename: 'new_year.jpg', text: 'New Year Special', color: '#f39c12' }
+            ];
+            
+            let created = 0;
+            images.forEach((img, index) => {
+                setTimeout(() => {
+                    createImage(img.filename, img.text, img.color);
+                    created++;
+                    if (created === images.length) {
+                        document.getElementById('status').innerHTML = '<p style="color: green;">✓ All images created successfully!</p>';
+                    }
+                }, index * 100);
+            });
+        }
+    </script>
+</body>
+</html>

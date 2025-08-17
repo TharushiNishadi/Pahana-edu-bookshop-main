@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Branch Database</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Branch Database Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Branch Handler Connection</h3>
+        <button onclick="testBranchHandler()">Test Branch Handler</button>
+        <div id="handlerResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Get All Branches (Database Query)</h3>
+        <button onclick="getAllBranches()">Get All Branches</button>
+        <div id="branchesResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Individual Branch Operations</h3>
+        <button onclick="testIndividualBranch()">Test Individual Branch</button>
+        <div id="individualResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Branch Creation</h3>
+        <button onclick="testCreateBranch()">Create Test Branch</button>
+        <div id="createResult" class="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        async function testBranchHandler() {
+            try {
+                showResult('handlerResult', '🔄 Testing branch handler connection...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-branch`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('handlerResult', `✅ Branch handler working!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('handlerResult', `❌ Branch handler failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('handlerResult', `❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function getAllBranches() {
+            try {
+                showResult('branchesResult', '🔄 Fetching all branches...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/branch`);
+                
+                if (response.ok) {
+                    const branches = await response.json();
+                    if (branches.length === 0) {
+                        showResult('branchesResult', `⚠️ No branches found in database.\n\nThis might be why delete operations are failing.\n\nResponse: ${JSON.stringify(branches, null, 2)}`, 'info');
+                    } else {
+                        showResult('branchesResult', `✅ Found ${branches.length} branches:\n\n${JSON.stringify(branches, null, 2)}`, 'success');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    showResult('branchesResult', `❌ Failed to get branches: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('branchesResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testIndividualBranch() {
+            try {
+                showResult('individualResult', '🔄 Testing individual branch operations...', 'info');
+                
+                // First get all branches to find an ID
+                const response = await fetch(`${BACKEND_URL}/branch`);
+                if (!response.ok) {
+                    showResult('individualResult', '❌ Cannot test individual branch - failed to get branches list', 'error');
+                    return;
+                }
+                
+                const branches = await response.json();
+                if (branches.length === 0) {
+                    showResult('individualResult', '⚠️ No branches to test with. Create a branch first.', 'info');
+                    return;
+                }
+                
+                const firstBranch = branches[0];
+                const branchId = firstBranch.branchId;
+                
+                showResult('individualResult', `🔄 Testing with branch ID: ${branchId}\n\nBranch data: ${JSON.stringify(firstBranch, null, 2)}`, 'info');
+                
+                // Test GET individual branch
+                const getResponse = await fetch(`${BACKEND_URL}/branch/${branchId}`);
+                if (getResponse.ok) {
+                    const branchData = await getResponse.json();
+                    showResult('individualResult', `✅ Individual branch GET working!\n\nBranch ID: ${branchId}\nBranch data: ${JSON.stringify(branchData, null, 2)}`, 'success');
+                } else {
+                    const errorText = await getResponse.text();
+                    showResult('individualResult', `❌ Individual branch GET failed: ${getResponse.status} ${getResponse.statusText}\n\nError: ${errorText}`, 'error');
+                }
+                
+            } catch (error) {
+                showResult('individualResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateBranch() {
+            try {
+                showResult('createResult', '🔄 Creating test branch...', 'info');
+                
+                const testBranch = {
+                    branchName: "Test Branch " + Date.now(),
+                    branchAddress: "Test Address " + Date.now(),
+                    branchPhone: "123-456-7890",
+                    branchEmail: "test@example.com"
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/branch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testBranch)
+                });
+                
+                if (response.ok) {
+                    const newBranch = await response.json();
+                    showResult('createResult', `✅ Test branch created successfully!\n\nNew branch: ${JSON.stringify(newBranch, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('createResult', `❌ Failed to create branch: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Gallery Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .warning { background-color: #fff3cd; border-color: #ffeaa7; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .image-preview { max-width: 200px; max-height: 200px; margin: 10px 0; border: 1px solid #ddd; }
+        .debug-info { background-color: #e9ecef; padding: 10px; margin: 10px 0; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Complete Gallery Debug Test</h1>
+    
+    <div class="test-section">
+        <h3>1️⃣ Test Backend Connection</h3>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="backend-connection-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2️⃣ Test Gallery Database Structure</h3>
+        <button onclick="testGalleryDatabase()">Test Gallery Database</button>
+        <div id="gallery-db-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3️⃣ Test Get All Gallery Images</h3>
+        <button onclick="testGetAllGalleryImages()">Get All Gallery Images</button>
+        <div id="get-gallery-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4️⃣ Test Individual Image Files</h3>
+        <button onclick="testIndividualImages()">Test Individual Images</button>
+        <div id="individual-images-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5️⃣ Test Add New Image</h3>
+        <input type="text" id="pictureType" placeholder="Picture Type (e.g., test)" style="width: 200px; margin-right: 10px;">
+        <input type="file" id="pictureFile" accept="image/*" style="margin-right: 10px;">
+        <button onclick="testAddImage()">Add Image</button>
+        <div id="add-image-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>6️⃣ Test Image Display with All Fields</h3>
+        <div id="image-display-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>7️⃣ Database Schema Check</h3>
+        <button onclick="checkDatabaseSchema()">Check Database Schema</button>
+        <div id="schema-result"></div>
+    </div>
+
+    <script>
+        // Test 1: Backend Connection
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backend-connection-result');
+            resultDiv.innerHTML = '<p>Testing backend connection...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/');
+                const text = await response.text();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Backend Connected Successfully!</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Response: ${text.substring(0, 100)}...</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Backend Connection Failed!</h4>
+                        <p>Error: ${error.message}</p>
+                        <p>Make sure your backend is running on port 12345</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test 2: Gallery Database Structure
+        async function testGalleryDatabase() {
+            const resultDiv = document.getElementById('gallery-db-result');
+            resultDiv.innerHTML = '<p>Testing gallery database...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/test-gallery-db');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Gallery Database Test Successful!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Gallery Database Test Failed!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test 3: Get All Gallery Images
+        async function testGetAllGalleryImages() {
+            const resultDiv = document.getElementById('get-gallery-result');
+            resultDiv.innerHTML = '<p>Fetching gallery images...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/gallery');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Gallery Images Retrieved!</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Images found: ${Array.isArray(data) ? data.length : 'Not an array'}</p>
+                        <div class="debug-info">
+                            <strong>Debug Info:</strong><br>
+                            Data type: ${typeof data}<br>
+                            Is Array: ${Array.isArray(data)}<br>
+                            First item: ${data && data.length > 0 ? JSON.stringify(data[0], null, 2) : 'No items'}
+                        </div>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                // Also test image display
+                if (Array.isArray(data) && data.length > 0) {
+                    testImageDisplay(data);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Get Gallery Images!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test 4: Test Individual Image Files
+        async function testIndividualImages() {
+            const resultDiv = document.getElementById('individual-images-result');
+            resultDiv.innerHTML = '<p>Testing individual image files...</p>';
+            
+            const testImages = ['book1.jpg', 'book2.jpg', 'book3.jpg', 'book4.jpg'];
+            let html = '<h4>Testing Image Files:</h4>';
+            
+            for (const imageFile of testImages) {
+                const imageUrl = `http://localhost:12345/images/${imageFile}`;
+                html += `
+                    <div style="margin: 10px; padding: 10px; border: 1px solid #ddd; display: inline-block;">
+                        <h5>${imageFile}</h5>
+                        <p>URL: ${imageUrl}</p>
+                        <img src="${imageUrl}" alt="${imageFile}" class="image-preview" 
+                             onerror="this.style.border='2px solid red'; this.alt='FAILED'; this.title='Image failed to load'"
+                             onload="this.style.border='2px solid green'; this.title='Image loaded successfully'">
+                    </div>
+                `;
+            }
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Test 5: Add New Image
+        async function testAddImage() {
+            const resultDiv = document.getElementById('add-image-result');
+            const pictureType = document.getElementById('pictureType').value;
+            const pictureFile = document.getElementById('pictureFile').files[0];
+            
+            if (!pictureType || !pictureFile) {
+                resultDiv.innerHTML = '<div class="error">Please fill in both fields</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<p>Adding image...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('pictureType', pictureType);
+                formData.append('picturePath', pictureFile);
+
+                const response = await fetch('http://localhost:12345/gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Image Added Successfully!</h4>
+                        <p>Status: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                // Refresh the gallery list
+                setTimeout(() => {
+                    testGetAllGalleryImages();
+                }, 1000);
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Add Image!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Test 6: Image Display with All Fields
+        function testImageDisplay(images) {
+            const resultDiv = document.getElementById('image-display-result');
+            let html = '<h4>🔍 Testing Image Display with All Fields:</h4>';
+            
+            images.forEach((image, index) => {
+                // Try all possible field combinations
+                const possibleUrls = [
+                    `http://localhost:12345/images/${image.pictureImage || ''}`,
+                    `http://localhost:12345/images/${image.picturePath || ''}`,
+                    `http://localhost:12345/images/${image.image || ''}`,
+                    `http://localhost:12345/images/${image.path || ''}`
+                ].filter(url => !url.includes('/images/'));
+                
+                html += `
+                    <div style="margin: 20px; padding: 15px; border: 2px solid #007bff; border-radius: 5px;">
+                        <h5>🖼️ Image ${index + 1}: ${image.pictureId}</h5>
+                        <div class="debug-info">
+                            <strong>All Available Fields:</strong><br>
+                            <pre>${JSON.stringify(image, null, 2)}</pre>
+                        </div>
+                        <p><strong>Type:</strong> ${image.pictureType || 'N/A'}</p>
+                        <p><strong>Name:</strong> ${image.pictureName || 'N/A'}</p>
+                        <p><strong>Image Field:</strong> ${image.pictureImage || 'null'}</p>
+                        <p><strong>Path Field:</strong> ${image.picturePath || 'null'}</p>
+                        <p><strong>Other Fields:</strong> ${Object.keys(image).filter(k => !['pictureId', 'pictureType', 'pictureName', 'pictureImage', 'picturePath'].includes(k)).join(', ') || 'None'}</p>
+                        
+                        <h6>Testing All Possible URLs:</h6>
+                `;
+                
+                possibleUrls.forEach((url, urlIndex) => {
+                    if (url && !url.includes('/images/')) {
+                        html += `
+                            <div style="margin: 10px; padding: 10px; border: 1px solid #ddd; display: inline-block;">
+                                <p><strong>URL ${urlIndex + 1}:</strong> ${url}</p>
+                                <img src="${url}" alt="Test ${urlIndex + 1}" class="image-preview" 
+                                     onerror="this.style.border='2px solid red'; this.alt='FAILED'; this.title='Failed: ${url}'"
+                                     onload="this.style.border='2px solid green'; this.title='Success: ${url}'">
+                            </div>
+                        `;
+                    }
+                });
+                
+                html += '</div>';
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+
+        // Test 7: Check Database Schema
+        async function checkDatabaseSchema() {
+            const resultDiv = document.getElementById('schema-result');
+            resultDiv.innerHTML = '<p>Checking database schema...</p>';
+            
+            try {
+                // Try to get table info
+                const response = await fetch('http://localhost:12345/test-gallery-db');
+                const data = await response.json();
+                
+                if (data.tableStructure) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Database Schema Retrieved!</h4>
+                            <h5>Gallery Table Structure:</h5>
+                            <table border="1" style="border-collapse: collapse; width: 100%;">
+                                <tr>
+                                    <th>Column Name</th>
+                                    <th>Type</th>
+                                    <th>Not Null</th>
+                                    <th>Default Value</th>
+                                </tr>
+                                ${data.tableStructure.map(col => `
+                                    <tr>
+                                        <td>${col.name}</td>
+                                        <td>${col.type}</td>
+                                        <td>${col.notNull}</td>
+                                        <td>${col.defaultValue || 'NULL'}</td>
+                                    </tr>
+                                `).join('')}
+                            </table>
+                            <p><strong>Total Images:</strong> ${data.usersCount || 'Unknown'}</p>
+                            <p><strong>Sample Images:</strong></p>
+                            <pre>${JSON.stringify(data.sampleUsers || [], null, 2)}</pre>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="warning">
+                            <h4>⚠️ Schema Info Not Available</h4>
+                            <p>Response data:</p>
+                            <pre>${JSON.stringify(data, null, 2)}</pre>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Check Schema!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-run first test
+        window.onload = function() {
+            testBackendConnection();
+        };
+    </script>
+</body>
+</html>

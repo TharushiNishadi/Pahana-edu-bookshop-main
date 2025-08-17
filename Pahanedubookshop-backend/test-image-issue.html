@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Image Issue Diagnosis</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-section { background: white; margin: 20px 0; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; background: #f8f9fa; }
+        img { max-width: 100px; border: 2px solid #ddd; margin: 5px; }
+        .image-test { display: inline-block; margin: 10px; text-align: center; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Image Issue Diagnosis Tool</h1>
+    
+    <div class="test-section">
+        <h3>1. Backend Connection Test</h3>
+        <button onclick="testBackendConnection()">Test Backend Connection</button>
+        <div id="backendResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Database Products Test</h3>
+        <button onclick="testDatabaseProducts()">Test Products API</button>
+        <div id="productsResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Image Serving Test</h3>
+        <button onclick="testImageServing()">Test Image Serving</button>
+        <div id="imageResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Specific Product Images Test</h3>
+        <button onclick="testProductImages()">Test Product Images</button>
+        <div id="productImagesResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Create Test Images</h3>
+        <button onclick="createTestImages()">Create Test Images</button>
+        <div id="createImagesResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>6. Directory Status</h3>
+        <button onclick="checkDirectoryStatus()">Check Directory Status</button>
+        <div id="directoryResult" class="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+
+        async function testBackendConnection() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = 'Testing backend connection...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/`);
+                if (response.ok) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Backend is running on port 12345!</span><br>
+                        <strong>Response:</strong><br>
+                        <pre>${text.substring(0, 500)}...</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Backend error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error">❌ Cannot connect to backend: ${error.message}</span><br>
+                    <strong>Make sure your backend server is running on port 12345</strong>
+                `;
+            }
+        }
+
+        async function testDatabaseProducts() {
+            const resultDiv = document.getElementById('productsResult');
+            resultDiv.innerHTML = 'Testing products API...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/product`);
+                if (response.ok) {
+                    const products = await response.json();
+                    let result = `<span class="success">✅ Products API working! Found ${products.length} products</span><br><br>`;
+                    
+                    products.forEach((product, index) => {
+                        result += `<strong>Product ${index + 1}:</strong><br>`;
+                        result += `ID: ${product.productId || product.id}<br>`;
+                        result += `Name: ${product.productName || product.name}<br>`;
+                        result += `Image: ${product.productImage || product.image || 'NO IMAGE'}<br>`;
+                        result += `Category: ${product.categoryName || product.category}<br><br>`;
+                    });
+                    
+                    resultDiv.innerHTML = result;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Products API error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Products API failed: ${error.message}</span>`;
+            }
+        }
+
+        async function testImageServing() {
+            const resultDiv = document.getElementById('imageResult');
+            resultDiv.innerHTML = 'Testing image serving...';
+            
+            try {
+                // Test a simple image request
+                const response = await fetch(`${BACKEND_URL}/images/test-image.jpg`);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Image serving working!</span><br>
+                        <strong>Test image loaded:</strong> ${blob.size} bytes<br>
+                        <img src="${BACKEND_URL}/images/test-image.jpg" alt="Test Image" onerror="this.style.borderColor='red'" onload="this.style.borderColor='green'">
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Image serving error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Image serving failed: ${error.message}</span>`;
+            }
+        }
+
+        async function testProductImages() {
+            const resultDiv = document.getElementById('productImagesResult');
+            resultDiv.innerHTML = 'Testing product images...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/product`);
+                if (response.ok) {
+                    const products = await response.json();
+                    let result = `<span class="info">📸 Testing ${products.length} product images:</span><br><br>`;
+                    
+                    products.forEach((product, index) => {
+                        const imagePath = product.productImage || product.image;
+                        if (imagePath) {
+                            result += `
+                                <div class="image-test">
+                                    <strong>${product.productName || product.name}</strong><br>
+                                    <small>Path: ${imagePath}</small><br>
+                                    <img src="${BACKEND_URL}/images/${imagePath}" 
+                                         alt="${product.productName || product.name}"
+                                         onerror="this.style.borderColor='red'; this.alt='❌ Failed'"
+                                         onload="this.style.borderColor='green'; this.alt='✅ Loaded'">
+                                </div>
+                            `;
+                        } else {
+                            result += `
+                                <div class="image-test">
+                                    <strong>${product.productName || product.name}</strong><br>
+                                    <small>No image path</small><br>
+                                    <span style="color: red;">❌ No Image</span>
+                                </div>
+                            `;
+                        }
+                    });
+                    
+                    resultDiv.innerHTML = result;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Cannot fetch products for image testing</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Product images test failed: ${error.message}</span>`;
+            }
+        }
+
+        async function createTestImages() {
+            const resultDiv = document.getElementById('createImagesResult');
+            resultDiv.innerHTML = 'Creating test images...';
+            
+            try {
+                // Test creating a simple image
+                const response = await fetch(`${BACKEND_URL}/test-create-image`);
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Test image creation working!</span><br>
+                        <strong>Result:</strong><br>
+                        <pre>${result}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Test image creation error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Test image creation failed: ${error.message}</span>`;
+            }
+        }
+
+        async function checkDirectoryStatus() {
+            const resultDiv = document.getElementById('directoryResult');
+            resultDiv.innerHTML = 'Checking directory status...';
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/test-images-status`);
+                if (response.ok) {
+                    const result = await response.text();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Directory status check working!</span><br>
+                        <strong>Status:</strong><br>
+                        <pre>${result}</pre>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Directory status check error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<span class="error">❌ Directory status check failed: ${error.message}</span>`;
+            }
+        }
+
+        // Auto-run basic tests on page load
+        window.onload = function() {
+            setTimeout(testBackendConnection, 500);
+            setTimeout(testDatabaseProducts, 1000);
+        };
+    </script>
+</body>
+</html>

@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import { toast } from 'react-toastify';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
 import FrtNavigation from '../Navigations/navigation4';
@@ -16,6 +18,7 @@ const ViewGallery = () => {
   const [showUpdateModal, setShowUpdateModal] = useState(false); // State to show/hide the update modal
   const [showDeleteModal, setShowDeleteModal] = useState(false); // State to show/hide the delete confirmation modal
   const [galleryToDelete, setGalleryToDelete] = useState(null); // State to store the gallery to be deleted
+  const [deleteLoading, setDeleteLoading] = useState(false); // State for delete loading
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,14 +57,100 @@ const ViewGallery = () => {
   const confirmDeleteImage = async () => {
     if (!galleryToDelete) return;
 
+    setDeleteLoading(true); // Start loading
+    
+    // Show loading notification
+    Swal.fire({
+      title: 'Deleting Gallery Item...',
+      text: 'Please wait while we delete your gallery item.',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      showConfirmButton: false,
+      didOpen: () => {
+        Swal.showLoading();
+      }
+    });
+
+    // Also show a loading toast
+    const loadingToast = toast.loading('Deleting gallery item...', {
+      position: "top-right",
+    });
+
     try {
       await axios.delete(`/gallery/${galleryToDelete.pictureId}`);
       setGalleries(galleries.filter(g => g.pictureId !== galleryToDelete.pictureId));
       setShowDeleteModal(false); // Close the delete modal after deletion
       setGalleryToDelete(null); // Clear the gallery to be deleted
+      
+      // Show success notification
+      Swal.fire({
+        title: 'Success!',
+        text: `Gallery item "${galleryToDelete.pictureId}" deleted successfully!`,
+        icon: 'success',
+        timer: 3000,
+        showConfirmButton: false,
+        footer: `Deleted: ${new Date().toLocaleString()}`
+      });
+
+      // Also show a toast notification
+      toast.success(`Gallery item "${galleryToDelete.pictureId}" deleted successfully!`, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Dismiss the loading toast
+      toast.dismiss(loadingToast);
     } catch (error) {
-      setError('Failed to delete image. Please try again later.');
+      console.error('Error deleting gallery item:', error);
+      
+      let errorMessage = 'Failed to delete image. ';
+      if (error.response) {
+        // Backend responded with error
+        const backendError = error.response.data;
+        if (backendError.error) {
+          errorMessage += backendError.error;
+        } else if (backendError.message) {
+          errorMessage += backendError.message;
+        } else {
+          errorMessage += `Status: ${error.response.status}`;
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'No response from server. Please check if backend is running.';
+      } else {
+        // Something else happened
+        errorMessage += error.message || 'Unknown error occurred.';
+      }
+      
+      setError(errorMessage);
       setShowDeleteModal(false);
+      
+      // Show error notification
+      Swal.fire({
+        title: 'Error!',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
+
+      // Also show a toast notification for the error
+      toast.error(`Gallery delete failed: ${errorMessage}`, {
+        position: "top-right",
+        autoClose: 8000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Dismiss the loading toast
+      toast.dismiss(loadingToast);
+    } finally {
+      setDeleteLoading(false); // End loading
     }
   };
 
@@ -83,7 +172,7 @@ const ViewGallery = () => {
   const filteredGalleries = galleries.filter(gallery =>
     gallery.pictureId.toLowerCase().includes(searchTerm) ||
     gallery.pictureType.toLowerCase().includes(searchTerm) ||
-    gallery.picturePath.toLowerCase().includes(searchTerm)
+    (gallery.pictureImage && gallery.pictureImage.toLowerCase().includes(searchTerm))
   );
 
   return (
@@ -132,7 +221,7 @@ const ViewGallery = () => {
                           <td>{gallery.pictureId}</td>
                           <td>{gallery.pictureType}</td>
                           <td> 
-                            <img src={`/images/${gallery.picturePath}`} alt={gallery.picturePath} className="product-pic-admin" />
+                            <img src={`http://localhost:12345/images/${gallery.pictureImage}`} alt={gallery.pictureName || gallery.picturePath} className="product-pic-admin" />
                           </td>
                           <td>
                             <button
@@ -185,10 +274,22 @@ const ViewGallery = () => {
                 </div>
                 <div className="modal-body">
                   <p>Are you sure you want to delete this Image? This action cannot be undone.</p>
+                  {galleryToDelete && (
+                    <div className="delete-details mt-3">
+                      <div className="alert alert-warning">
+                        <strong>Item to be deleted:</strong><br />
+                        <strong>ID:</strong> {galleryToDelete.pictureId}<br />
+                        <strong>Type:</strong> {galleryToDelete.pictureType}<br />
+                        <strong>Name:</strong> {galleryToDelete.pictureName || 'N/A'}
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="modal-footer">
                   <button className="btn btn-secondary" onClick={cancelDeleteImage}>Cancel</button>
-                  <button className="btn btn-danger" onClick={confirmDeleteImage}>Delete</button>
+                  <button className="btn btn-danger" onClick={confirmDeleteImage} disabled={deleteLoading}>
+                    {deleteLoading ? 'Deleting...' : 'Delete'}
+                  </button>
                 </div>
               </div>
             </div>

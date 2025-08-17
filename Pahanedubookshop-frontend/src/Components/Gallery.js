@@ -13,8 +13,12 @@ const Gallery = () => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await fetch(`/gallery?pictureType=${type || ''}`);
+        console.log('Fetching gallery images...');
+        const response = await fetch(`http://localhost:12345/gallery?pictureType=${type || ''}`);
         const data = await response.json();
+        console.log('Gallery response:', response);
+        console.log('Gallery data:', data);
+        
         if (data.length === 0) {
           setMessage('No images available for this category.');
         } else {
@@ -71,11 +75,28 @@ const Gallery = () => {
             <p className="no-images-message">{message}</p>
           ) : (
             <div className="gallery-images">
-              {images.map(image => (
-                <div key={image.pictureId} className="gallery-item">
-                  <img src={`/images/${image.picturePath}`} alt={image.pictureId} />
-                </div>
-              ))}
+              {images.map(image => {
+                const imageUrl = `http://localhost:12345/images/${image.pictureImage || image.picturePath}`;
+                console.log('Image data:', image);
+                console.log('Generated image URL:', imageUrl);
+                
+                return (
+                  <div key={image.pictureId} className="gallery-item">
+                    <img 
+                      src={imageUrl} 
+                      alt={image.pictureId} 
+                      onError={(e) => {
+                        console.error('Image failed to load:', imageUrl);
+                        e.target.style.border = '2px solid red';
+                        e.target.alt = 'IMAGE FAILED TO LOAD';
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', imageUrl);
+                      }}
+                    />
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>

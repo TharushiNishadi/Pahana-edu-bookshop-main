@@ -15,11 +15,14 @@ const FavoritesPage = () => {
   const navigate = useNavigate();
   const user = JSON.parse(localStorage.getItem('user'));
   const userId = user ? user.userId : null;
+  
+  // Backend base URL
+  const BACKEND_URL = 'http://localhost:12345';
 
   useEffect(() => {
     const fetchFavoriteProductIds = async () => {
       try {
-        const response = await axios.get(`/api/favorites/list?userId=${userId}`);
+        const response = await axios.get(`${BACKEND_URL}/api/favorites/list?userId=${userId}`);
         setFavoriteProductIds(response.data);
         setFavorites(new Set(response.data));
       } catch (error) {
@@ -33,14 +36,26 @@ const FavoritesPage = () => {
   useEffect(() => {
     const fetchProductDetails = async () => {
       try {
+        console.log('Fetching product details for IDs:', favoriteProductIds);
+        
         const productRequests = favoriteProductIds.map((productId) =>
-          axios.get(`/product/byProductId/${productId}`)
+          axios.get(`${BACKEND_URL}/product/${productId}`)
         );
+        
+        console.log('Making product requests:', productRequests.length);
         const responses = await Promise.all(productRequests);
+        console.log('Product responses received:', responses.length);
+        
         const products = responses.map((response) => response.data);
+        console.log('Products parsed:', products);
+        
         setProductDetails(products);
       } catch (error) {
         console.error('Error fetching product details:', error);
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          console.error('Error status:', error.response.status);
+        }
       }
     };
 
@@ -52,7 +67,7 @@ const FavoritesPage = () => {
   useEffect(() => {
     const fetchCartDetails = async () => {
       try {
-        const response = await axios.get(`/api/cart/details?userId=${userId}`);
+        const response = await axios.get(`${BACKEND_URL}/api/cart/details?userId=${userId}`);
         const cartData = response.data;
         const cartItems = cartData.productId || {};
         setCart(cartItems);
@@ -85,11 +100,11 @@ const FavoritesPage = () => {
 
       
       if (quantity < 1) {
-        toast.warn('Quantity must be at least 1');
+        toast.warn('Please select a quantity first using the + button');
         return;
       }
 
-      await axios.post('/api/cart/add', null, {
+      await axios.post(`${BACKEND_URL}/api/cart/add`, null, {
         params: {
           userId,
           productId: product.productId,
@@ -97,7 +112,7 @@ const FavoritesPage = () => {
         }
       });
 
-      toast.success('Cart Updated Successfully!');
+      toast.success('Product added to cart successfully!');
     } catch (error) {
       console.error('Error adding product to cart:', error);
       toast.error('Error adding product to cart.');
@@ -115,14 +130,14 @@ const FavoritesPage = () => {
 
     try {
       if (isFavorite) {
-        await axios.post('/api/favorites/remove', null, { params: { userId, productId } });
+        await axios.post(`${BACKEND_URL}/api/favorites/remove`, null, { params: { userId, productId } });
         newFavorites.delete(productId);
         setFavoriteProductIds((prevIds) => prevIds.filter(id => id !== productId));
         setProductDetails((prevProducts) => prevProducts.filter(product => product.productId !== productId));
       } else {
-        await axios.post('/api/favorites/add', null, { params: { userId, productId } });
+        await axios.post(`${BACKEND_URL}/api/favorites/add`, null, { params: { userId, productId } });
         newFavorites.add(productId);
-        const response = await axios.get(`/product/byProductId/${productId}`);
+        const response = await axios.get(`${BACKEND_URL}/product/${productId}`);
         setProductDetails(prev => [...prev, response.data]);
       }
 

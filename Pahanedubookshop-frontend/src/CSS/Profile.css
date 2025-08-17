@@ -223,6 +223,13 @@
   width: 100%;
 }
 
+.search-status {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
 .button-container {
   margin-left: auto;
 }

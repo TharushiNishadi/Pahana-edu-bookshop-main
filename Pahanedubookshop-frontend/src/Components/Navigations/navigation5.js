@@ -48,9 +48,9 @@ const SideNavigation = () => {
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/admin-dashboard' ? 'active' : ''}`} to="/admin-dashboard">User</Link>
                     </li>
-                    {/* <li className="nav-item">
+                    { <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-branch' ? 'active' : ''}`} to="/view-branch">Branch</Link>
-                    </li> */}
+                    </li> }
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-product' ? 'active' : ''}`} to="/view-product">Products</Link>
                     </li>

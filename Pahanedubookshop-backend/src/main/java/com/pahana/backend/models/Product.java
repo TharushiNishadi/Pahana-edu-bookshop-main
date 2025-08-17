@@ -9,6 +9,9 @@ public class Product {
     private double productPrice;
     private String productImage;
     private String productDescription;
+    private int stockQuantity;
+    private String status;
+    private double discountPercentage;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -21,6 +24,22 @@ public class Product {
         this.productPrice = productPrice;
         this.productImage = productImage;
         this.productDescription = productDescription;
+        this.stockQuantity = 0;
+        this.status = "Active";
+        this.discountPercentage = 0.0;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    public Product(String productName, String categoryName, double productPrice, String productImage, String productDescription, int stockQuantity, String status, double discountPercentage) {
+        this.productName = productName;
+        this.categoryName = categoryName;
+        this.productPrice = productPrice;
+        this.productImage = productImage;
+        this.productDescription = productDescription;
+        this.stockQuantity = stockQuantity;
+        this.status = status;
+        this.discountPercentage = discountPercentage;
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
@@ -72,6 +91,30 @@ public class Product {
 
     public void setProductDescription(String productDescription) {
         this.productDescription = productDescription;
+    }
+
+    public int getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(int stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public double getDiscountPercentage() {
+        return discountPercentage;
+    }
+
+    public void setDiscountPercentage(double discountPercentage) {
+        this.discountPercentage = discountPercentage;
     }
 
     public LocalDateTime getCreatedAt() {

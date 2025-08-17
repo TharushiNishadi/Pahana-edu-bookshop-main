@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Branch Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background: white; }
+        button { padding: 12px 20px; margin: 8px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 15px 0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        .info { background: #d1ecf1; border: 1px solid #bee5eb; color: #0c5460; }
+        .warning { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; }
+        input { padding: 10px; margin: 5px; border: 1px solid #ddd; border-radius: 5px; width: 250px; }
+        .method-test { display: flex; gap: 10px; align-items: center; margin: 10px 0; }
+        .method-label { min-width: 80px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Branch Error - "Method not allowed"</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Backend Connection</h3>
+        <button onclick="testConnection()">Test Backend Connection</button>
+        <div id="connectionResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Test All HTTP Methods on /branch</h3>
+        <p>This will test what HTTP methods are actually accepted by the backend.</p>
+        
+        <div class="method-test">
+            <span class="method-label">GET:</span>
+            <button onclick="testMethod('GET', '/branch')">Test GET /branch</button>
+        </div>
+        
+        <div class="method-test">
+            <span class="method-label">POST:</span>
+            <button onclick="testMethod('POST', '/branch')">Test POST /branch</button>
+        </div>
+        
+        <div class="method-test">
+            <span class="method-label">PUT:</span>
+            <button onclick="testMethod('PUT', '/branch')">Test PUT /branch</button>
+        </div>
+        
+        <div class="method-test">
+            <span class="method-label">DELETE:</span>
+            <button onclick="testMethod('DELETE', '/branch')">Test DELETE /branch</button>
+        </div>
+        
+        <div id="methodResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Individual Branch Operations</h3>
+        <input type="text" id="branchId" placeholder="Enter a branch ID (e.g., branch001)" value="branch001">
+        
+        <div class="method-test">
+            <span class="method-label">GET:</span>
+            <button onclick="testIndividualBranch('GET')">Test GET /branch/{id}</button>
+        </div>
+        
+        <div class="method-test">
+            <span class="method-label">PUT:</span>
+            <button onclick="testIndividualBranch('PUT')">Test PUT /branch/{id}</button>
+        </div>
+        
+        <div class="method-test">
+            <span class="method-label">DELETE:</span>
+            <button onclick="testIndividualBranch('DELETE')">Test DELETE /branch/{id}</button>
+        </div>
+        
+        <div id="individualResults" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Branch Creation with Data</h3>
+        <button onclick="testCreateBranch()">Test Create Branch with Sample Data</button>
+        <div id="createResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Check Backend Logs</h3>
+        <p>After running tests above, check your backend console for any error messages or logs.</p>
+        <button onclick="showBackendInfo()">Show Backend Info</button>
+        <div id="backendInfo" class="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        function clearResults() {
+            document.getElementById('methodResults').textContent = '';
+            document.getElementById('individualResults').textContent = '';
+            document.getElementById('createResult').textContent = '';
+        }
+
+        async function testConnection() {
+            try {
+                showResult('connectionResult', '🔄 Testing backend connection...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-branch`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('connectionResult', `✅ Backend connected successfully!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('connectionResult', `❌ Backend connection failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('connectionResult', `❌ Connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testMethod(method, endpoint) {
+            try {
+                clearResults();
+                showResult('methodResults', `🔄 Testing ${method} ${endpoint}...`, 'info');
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                // Add body for POST/PUT requests
+                if (method === 'POST' || method === 'PUT') {
+                    options.body = JSON.stringify({
+                        branchName: 'Test Branch',
+                        branchAddress: 'Test Address'
+                    });
+                }
+                
+                const response = await fetch(`${BACKEND_URL}${endpoint}`, options);
+                
+                let resultText = `${method} ${endpoint}:\n`;
+                resultText += `Status: ${response.status} ${response.statusText}\n`;
+                
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        resultText += `✅ Success!\nResponse: ${JSON.stringify(data, null, 2)}`;
+                        showResult('methodResults', resultText, 'success');
+                    } catch (e) {
+                        resultText += `✅ Success! (No JSON response)`;
+                        showResult('methodResults', resultText, 'success');
+                    }
+                } else {
+                    try {
+                        const errorData = await response.json();
+                        resultText += `❌ Failed: ${errorData.error || errorData.message || 'Unknown error'}`;
+                        showResult('methodResults', resultText, 'error');
+                    } catch (e) {
+                        const errorText = await response.text();
+                        resultText += `❌ Failed: ${errorText || 'Unknown error'}`;
+                        showResult('methodResults', resultText, 'error');
+                    }
+                }
+            } catch (error) {
+                showResult('methodResults', `❌ Error testing ${method} ${endpoint}: ${error.message}`, 'error');
+            }
+        }
+
+        async function testIndividualBranch(method) {
+            try {
+                const branchId = document.getElementById('branchId').value.trim();
+                if (!branchId) {
+                    showResult('individualResults', '❌ Please enter a branch ID', 'error');
+                    return;
+                }
+                
+                clearResults();
+                showResult('individualResults', `🔄 Testing ${method} /branch/${branchId}...`, 'info');
+                
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (method === 'PUT') {
+                    options.body = JSON.stringify({
+                        branchName: 'Updated Branch',
+                        branchAddress: 'Updated Address'
+                    });
+                }
+                
+                const response = await fetch(`${BACKEND_URL}/branch/${branchId}`, options);
+                
+                let resultText = `${method} /branch/${branchId}:\n`;
+                resultText += `Status: ${response.status} ${response.statusText}\n`;
+                
+                if (response.ok) {
+                    try {
+                        const data = await response.json();
+                        resultText += `✅ Success!\nResponse: ${JSON.stringify(data, null, 2)}`;
+                        showResult('individualResults', resultText, 'success');
+                    } catch (e) {
+                        resultText += `✅ Success! (No JSON response)`;
+                        showResult('individualResults', resultText, 'success');
+                    }
+                } else {
+                    try {
+                        const errorData = await response.json();
+                        resultText += `❌ Failed: ${errorData.error || errorData.message || 'Unknown error'}`;
+                        showResult('individualResults', resultText, 'error');
+                    } catch (e) {
+                        const errorText = await response.text();
+                        resultText += `❌ Failed: ${errorText || 'Unknown error'}`;
+                        showResult('individualResults', resultText, 'error');
+                    }
+                }
+            } catch (error) {
+                showResult('individualResults', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateBranch() {
+            try {
+                showResult('createResult', '🔄 Testing branch creation...', 'info');
+                
+                const testBranch = {
+                    branchName: "Debug Test Branch " + Date.now(),
+                    branchAddress: "Debug Test Address " + Date.now(),
+                    branchPhone: "123-456-7890",
+                    branchEmail: "debug@test.com"
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/branch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testBranch)
+                });
+                
+                if (response.ok) {
+                    const newBranch = await response.json();
+                    showResult('createResult', `✅ Branch created successfully!\n\nNew branch: ${JSON.stringify(newBranch, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult('createResult', `❌ Failed to create branch: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', `❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        function showBackendInfo() {
+            const info = `🔧 Backend Debug Information:
+
+1. Backend URL: ${BACKEND_URL}
+2. Branch Endpoints:
+   - GET /branch - List all branches
+   - POST /branch - Create new branch
+   - GET /branch/{id} - Get specific branch
+   - PUT /branch/{id} - Update specific branch
+   - DELETE /branch/{id} - Delete specific branch
+
+3. Test Endpoints:
+   - POST /test-branch - Test branch handler
+
+4. Common Issues:
+   - Backend not running on port 12345
+   - BranchHandler not compiled properly
+   - Database connection issues
+   - CORS configuration problems
+
+5. To Fix:
+   - Restart backend server
+   - Check backend console for errors
+   - Verify database connection
+   - Check if tables exist
+
+6. Run these tests and check your backend console for any error messages!`;
+            
+            showResult('backendInfo', info, 'info');
+        }
+    </script>
+</body>
+</html>

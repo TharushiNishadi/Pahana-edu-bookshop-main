@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Missing Gallery Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .image-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        canvas { border: 2px solid #007bff; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .download-link { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .download-link:hover { background: #218838; }
+        .instructions { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Generate Missing Gallery Images</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li><strong>Click "Generate All Images"</strong> to create the missing gallery images</li>
+                <li><strong>Download each image</strong> by clicking the download links</li>
+                <li><strong>Save all images</strong> to your backend's <code>images/</code> folder</li>
+                <li><strong>Restart your backend server</strong></li>
+                <li><strong>Test the gallery page</strong> - images should now display!</li>
+            </ol>
+        </div>
+        
+        <div class="image-section">
+            <h3>1. Fiction Gallery Image</h3>
+            <canvas id="fictionCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createFictionImage()">Create Fiction Image</button>
+            <div id="fictionResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>2. Non-Fiction Gallery Image</h3>
+            <canvas id="nonFictionCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createNonFictionImage()">Create Non-Fiction Image</button>
+            <div id="nonFictionResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>3. Academic Gallery Image</h3>
+            <canvas id="academicCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createAcademicImage()">Create Academic Image</button>
+            <div id="academicResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>4. Children Gallery Image</h3>
+            <canvas id="childrenCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createChildrenImage()">Create Children Image</button>
+            <div id="childrenResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>5. Quick Fix - Generate All Images</h3>
+            <button onclick="createAllImages()" style="background: #dc3545; font-size: 16px; padding: 15px 30px;">🚀 Generate All Missing Images</button>
+            <div id="allImagesResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>6. Test Backend Connection</h3>
+            <button onclick="testBackend()">Test Backend Status</button>
+            <div id="backendResult"></div>
+        </div>
+    </div>
+
+    <script>
+        function createImage(canvas, title, color, icon, emoji) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, adjustBrightness(color, -30));
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, canvas.width/2, 70);
+            
+            // Subtitle
+            ctx.font = '14px Arial';
+            ctx.fillText('Gallery Image', canvas.width/2, 95);
+            
+            // Icon
+            ctx.font = '36px Arial';
+            ctx.fillText(emoji, canvas.width/2, 140);
+            
+            // Border
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(5, 5, canvas.width-10, canvas.height-10);
+            
+            // Corner accents
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(0, 0, 20, 20);
+            ctx.fillRect(canvas.width-20, 0, 20, 20);
+            ctx.fillRect(0, canvas.height-20, 20, 20);
+            ctx.fillRect(canvas.width-20, canvas.height-20, 20, 20);
+        }
+        
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
+        }
+        
+        function createFictionImage() {
+            createImage(document.getElementById('fictionCanvas'), 'Fiction Books', '#e74c3c', '📚', '📚');
+            downloadCanvas('fictionCanvas', 'fiction-gallery.jpg', 'fictionResult');
+        }
+        
+        function createNonFictionImage() {
+            createImage(document.getElementById('nonFictionCanvas'), 'Non-Fiction Books', '#3498db', '📖', '📖');
+            downloadCanvas('nonFictionCanvas', 'non-fiction-gallery.jpg', 'nonFictionResult');
+        }
+        
+        function createAcademicImage() {
+            createImage(document.getElementById('academicCanvas'), 'Academic Books', '#9b59b6', '🎓', '🎓');
+            downloadCanvas('academicCanvas', 'academic-gallery.jpg', 'academicResult');
+        }
+        
+        function createChildrenImage() {
+            createImage(document.getElementById('childrenCanvas'), 'Children Books', '#f39c12', '🧸', '🧸');
+            downloadCanvas('childrenCanvas', 'children-gallery.jpg', 'childrenResult');
+        }
+        
+        function downloadCanvas(canvasId, filename, resultId) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = `
+                <span class="success">✅ Image created successfully!</span><br>
+                <a href="${link.href}" download="${filename}" class="download-link">📥 Download ${filename}</a>
+                <br><small><strong>Save this file to:</strong> Pahanedubookshop-backend/images/${filename}</small>
+            `;
+        }
+        
+        function createAllImages() {
+            createFictionImage();
+            setTimeout(() => createNonFictionImage(), 100);
+            setTimeout(() => createAcademicImage(), 200);
+            setTimeout(() => createChildrenImage(), 300);
+            
+            document.getElementById('allImagesResult').innerHTML = `
+                <span class="success">✅ All 4 images generated successfully!</span><br><br>
+                <div class="instructions">
+                    <h4>📋 Next Steps:</h4>
+                    <ol>
+                        <li><strong>Download all 4 images above</strong> using the download links</li>
+                        <li><strong>Create folder:</strong> <code>Pahanedubookshop-backend/images/</code></li>
+                        <li><strong>Save all images</strong> to that folder</li>
+                        <li><strong>Restart your backend server</strong></li>
+                        <li><strong>Test the gallery page</strong> - images should now display!</li>
+                    </ol>
+                    <p><strong>Expected Result:</strong> No more broken image icons in your gallery! 🎉</p>
+                </div>
+            `;
+        }
+        
+        async function testBackend() {
+            const resultDiv = document.getElementById('backendResult');
+            resultDiv.innerHTML = 'Testing backend connection...';
+            
+            try {
+                const response = await fetch('http://localhost:12345/');
+                if (response.ok) {
+                    const text = await response.text();
+                    resultDiv.innerHTML = `
+                        <span class="success">✅ Backend is running on port 12345!</span><br>
+                        <small><strong>Response:</strong> ${text.substring(0, 100)}...</small>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<span class="error">❌ Backend error: ${response.status}</span>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <span class="error">❌ Cannot connect to backend: ${error.message}</span><br>
+                    <small><strong>Make sure your backend server is running on port 12345</strong></small>
+                `;
+            }
+        }
+        
+        // Auto-generate all images on page load
+        window.onload = function() {
+            setTimeout(createAllImages, 500);
+            setTimeout(testBackend, 1000);
+        };
+    </script>
+</body>
+</html>

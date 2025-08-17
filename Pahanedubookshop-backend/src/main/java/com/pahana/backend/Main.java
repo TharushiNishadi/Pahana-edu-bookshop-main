@@ -14,10 +14,10 @@ public class Main {
             JwtUtil.initialize();
             
             // Start HTTP server
-            CustomHttpServer server = new CustomHttpServer(8080);
+            CustomHttpServer server = new CustomHttpServer(12345);
             server.start();
             
-            System.out.println("Pahana Edu Bookshop Backend Server started on port 8080");
+            System.out.println("Pahana Edu Bookshop Backend Server started on port 12345");
             System.out.println("Press Ctrl+C to stop the server");
             
             // Keep the server running

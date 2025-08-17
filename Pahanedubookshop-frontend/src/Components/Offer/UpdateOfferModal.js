@@ -31,6 +31,12 @@ const UpdateOfferModal = ({ show, handleClose, offer, onUpdate }) => {
 
     setLoading(true);
 
+    // Debug logging
+    console.log('=== DEBUG OFFER UPDATE ===');
+    console.log('Offer object:', offer);
+    console.log('Offer ID being sent:', offer.offerId);
+    console.log('Form data being sent:', { offerName, offerDescription, offerValue });
+
     try {
       await axios.put(`/offer/${offer.offerId}`, {
         offerName,
@@ -41,7 +47,31 @@ const UpdateOfferModal = ({ show, handleClose, offer, onUpdate }) => {
       handleClose();
     } catch (error) {
       console.error('Error updating offer', error);
-      alert('Failed to update offer. Please try again.');
+      
+      // Show detailed error information
+      let errorMessage = 'Failed to update offer. ';
+      if (error.response) {
+        // Backend responded with error
+        const backendError = error.response.data;
+        if (backendError.error) {
+          errorMessage += backendError.error;
+        } else if (backendError.message) {
+          errorMessage += backendError.message;
+        } else {
+          errorMessage += `Status: ${error.response.status}`;
+        }
+        console.error('Backend error details:', backendError);
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'No response from server. Please check if backend is running.';
+        console.error('No response received:', error.request);
+      } else {
+        // Something else happened
+        errorMessage += error.message || 'Unknown error occurred.';
+        console.error('Request setup error:', error.message);
+      }
+      
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

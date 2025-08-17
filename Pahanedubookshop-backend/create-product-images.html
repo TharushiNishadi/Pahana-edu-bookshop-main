@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Missing Product Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .image-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        canvas { border: 2px solid #007bff; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .download-link { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .download-link:hover { background: #218838; }
+        .instructions { background: #e7f3ff; padding: 15px; border-radius: 5px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Create Missing Product Images</h1>
+        
+        <div class="instructions">
+            <h3>📋 Instructions:</h3>
+            <ol>
+                <li><strong>Click "Generate All Product Images"</strong> to create the missing product images</li>
+                <li><strong>Download each image</strong> by clicking the download links</li>
+                <li><strong>Save all images</strong> to your backend's <code>images/</code> folder</li>
+                <li><strong>Restart your backend server</strong></li>
+                <li><strong>Test the admin dashboard</strong> - images should now display!</li>
+            </ol>
+        </div>
+        
+        <div class="image-section">
+            <h3>1. North and South (Fiction)</h3>
+            <canvas id="northSouthCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createNorthSouthImage()">Create North and South Image</button>
+            <div id="northSouthResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>2. Lolita 1 (Fiction)</h3>
+            <canvas id="lolitaCanvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createLolitaImage()">Create Lolita 1 Image</button>
+            <div id="lolitaResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>3. Sample Book 1 (Fiction)</h3>
+            <canvas id="sample1Canvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createSample1Image()">Create Sample Book 1 Image</button>
+            <div id="sample1Result"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>4. Sample Book 2 (Non-Fiction)</h3>
+            <canvas id="sample2Canvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createSample2Image()">Create Sample Book 2 Image</button>
+            <div id="sample2Result"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>5. Sample Book 3 (Academic)</h3>
+            <canvas id="sample3Canvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createSample3Image()">Create Sample Book 3 Image</button>
+            <div id="sample3Result"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>6. Sample Book 4 (Children)</h3>
+            <canvas id="sample4Canvas" width="300" height="200"></canvas>
+            <br>
+            <button onclick="createSample4Image()">Create Sample Book 4 Image</button>
+            <div id="sample4Result"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>7. Quick Fix - Generate All Images</h3>
+            <button onclick="createAllProductImages()" style="background: #dc3545; font-size: 16px; padding: 15px 30px;">🚀 Generate All Product Images</button>
+            <div id="allImagesResult"></div>
+        </div>
+    </div>
+
+    <script>
+        function createImage(canvas, title, color, icon, emoji) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, adjustBrightness(color, -30));
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, canvas.width/2, 70);
+            
+            // Subtitle
+            ctx.font = '14px Arial';
+            ctx.fillText('Product Image', canvas.width/2, 95);
+            
+            // Icon
+            ctx.font = '36px Arial';
+            ctx.fillText(emoji, canvas.width/2, 140);
+            
+            // Border
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(5, 5, canvas.width-10, canvas.height-10);
+            
+            // Corner accents
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
+            ctx.fillRect(0, 0, 20, 20);
+            ctx.fillRect(canvas.width-20, 0, 20, 20);
+            ctx.fillRect(0, canvas.height-20, 20, 20);
+            ctx.fillRect(canvas.width-20, canvas.height-20, 20, 20);
+        }
+        
+        function adjustBrightness(hex, percent) {
+            const num = parseInt(hex.replace("#",""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) + amt;
+            const G = (num >> 8 & 0x00FF) + amt;
+            const B = (num & 0x0000FF) + amt;
+            return "#" + (0x1000000 + (R<255?R<1?0:R:255)*0x10000 + (G<255?G<1?0:G:255)*0x100 + (B<255?B<1?0:B:255)).toString(16).slice(1);
+        }
+        
+        function createNorthSouthImage() {
+            createImage(document.getElementById('northSouthCanvas'), 'North and South', '#e74c3c', '📚', '📚');
+            downloadCanvas('northSouthCanvas', 'North and South.jpg', 'northSouthResult');
+        }
+        
+        function createLolitaImage() {
+            createImage(document.getElementById('lolitaCanvas'), 'Lolita 1', '#3498db', '📖', '📖');
+            downloadCanvas('lolitaCanvas', 'Lolita 1.jpg', 'lolitaResult');
+        }
+        
+        function createSample1Image() {
+            createImage(document.getElementById('sample1Canvas'), 'Sample Book 1', '#9b59b6', '📚', '📚');
+            downloadCanvas('sample1Canvas', 'Sample Book 1.jpg', 'sample1Result');
+        }
+        
+        function createSample2Image() {
+            createImage(document.getElementById('sample2Canvas'), 'Sample Book 2', '#f39c12', '📖', '📖');
+            downloadCanvas('sample2Canvas', 'Sample Book 2.jpg', 'sample2Result');
+        }
+        
+        function createSample3Image() {
+            createImage(document.getElementById('sample3Canvas'), 'Sample Book 3', '#2ecc71', '🎓', '🎓');
+            downloadCanvas('sample3Canvas', 'Sample Book 3.jpg', 'sample3Result');
+        }
+        
+        function createSample4Image() {
+            createImage(document.getElementById('sample4Canvas'), 'Sample Book 4', '#e67e22', '🧸', '🧸');
+            downloadCanvas('sample4Canvas', 'Sample Book 4.jpg', 'sample4Result');
+        }
+        
+        function downloadCanvas(canvasId, filename, resultId) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = `
+                <span class="success">✅ Image created successfully!</span><br>
+                <a href="${link.href}" download="${filename}" class="download-link">📥 Download ${filename}</a>
+                <br><small><strong>Save this file to:</strong> Pahanedubookshop-backend/images/${filename}</small>
+            `;
+        }
+        
+        function createAllProductImages() {
+            createNorthSouthImage();
+            setTimeout(() => createLolitaImage(), 100);
+            setTimeout(() => createSample1Image(), 200);
+            setTimeout(() => createSample2Image(), 300);
+            setTimeout(() => createSample3Image(), 400);
+            setTimeout(() => createSample4Image(), 500);
+            
+            document.getElementById('allImagesResult').innerHTML = `
+                <span class="success">✅ All 6 product images generated successfully!</span><br><br>
+                <div class="instructions">
+                    <h4>📋 Next Steps:</h4>
+                    <ol>
+                        <li><strong>Download all 6 images above</strong> using the download links</li>
+                        <li><strong>Create folder:</strong> <code>Pahanedubookshop-backend/images/</code></li>
+                        <li><strong>Save all images</strong> to that folder</li>
+                        <li><strong>Restart your backend server</strong></li>
+                        <li><strong>Test the admin dashboard</strong> - product images should now display!</li>
+                    </ol>
+                    <p><strong>Expected Result:</strong> No more broken image icons in your products table! 🎉</p>
+                </div>
+            `;
+        }
+        
+        // Auto-generate all images on page load
+        window.onload = function() {
+            setTimeout(createAllProductImages, 500);
+        };
+    </script>
+</body>
+</html>

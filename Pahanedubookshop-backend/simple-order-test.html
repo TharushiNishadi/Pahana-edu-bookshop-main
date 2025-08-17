@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Order Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button { background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 10px; }
+        button:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Simple Order Test</h1>
+        <p>This tests if the Long to Double casting error is fixed.</p>
+        
+        <button onclick="testOrder()">📦 Test Create Order</button>
+        <div id="result" class="result info">Click the button to test...</div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        function showResult(message, type = 'info') {
+            document.getElementById('result').textContent = message;
+            document.getElementById('result').className = `result ${type}`;
+        }
+        
+        async function testOrder() {
+            try {
+                showResult('🔄 Testing order creation...', 'info');
+                
+                // This order data was causing the Long to Double error
+                const orderData = {
+                    userId: "test_user",
+                    userEmail: "test@example.com",
+                    items: [
+                        {
+                            productId: "prod_001",
+                            productName: "Test Product",
+                            quantity: 2,        // Long value
+                            price: 1500         // Long value
+                        }
+                    ],
+                    branch: "Main Branch",
+                    paymentMethod: "Cash",
+                    deliveryAddress: "123 Test Street",
+                    taxAmount: 150,             // Long value
+                    deliveryCharges: 200,       // Long value
+                    discountAmount: 100,        // Long value
+                    finalAmount: 2950           // Long value
+                };
+                
+                console.log('Sending order:', orderData);
+                
+                const response = await fetch(`${BACKEND_URL}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult(`✅ SUCCESS! Order created!\n\nOrder ID: ${result.orderId}\nFinal Amount: ${result.finalAmount}\n\nResponse: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ FAILED: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ ERROR: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
+

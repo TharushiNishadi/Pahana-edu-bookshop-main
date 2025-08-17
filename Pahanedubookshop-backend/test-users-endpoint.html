@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Users Endpoint</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Test Users Endpoint</h1>
+    
+    <div class="test-section">
+        <h3>Test Users Database Structure</h3>
+        <button onclick="testUsersDatabase()">Test Users Database</button>
+        <div id="users-db-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Get All Users</h3>
+        <button onclick="testGetAllUsers()">Get All Users</button>
+        <div id="get-users-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test with Authorization</h3>
+        <input type="text" id="token-input" placeholder="Enter JWT token (optional)" style="width: 400px; margin-right: 10px;">
+        <button onclick="testGetUsersWithAuth()">Get Users with Auth</button>
+        <div id="auth-users-result"></div>
+    </div>
+
+    <script>
+        async function testUsersDatabase() {
+            const resultDiv = document.getElementById('users-db-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/test-users-db');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testGetAllUsers() {
+            const resultDiv = document.getElementById('get-users-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/users');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Users found: ${Array.isArray(data) ? data.length : 'Not an array'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testGetUsersWithAuth() {
+            const resultDiv = document.getElementById('auth-users-result');
+            const token = document.getElementById('token-input').value;
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch('http://localhost:12345/users', {
+                    headers: headers
+                });
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Users found: ${Array.isArray(data) ? data.length : 'Not an array'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

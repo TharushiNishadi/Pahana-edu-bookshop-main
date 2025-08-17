@@ -21,7 +21,10 @@ const AddProduct = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get('/category')
+        // Use the correct backend URL for API calls
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        axios.get(`${BACKEND_URL}/category`)
             .then(response => {
                 setCategories(response.data);
             })
@@ -91,7 +94,10 @@ const AddProduct = () => {
             data.append('productImage', formData.productImage);
             data.append('productDescription', formData.productDescription);
 
-            axios.post('/product', data, {
+            // Use the correct backend URL for image uploads
+            const BACKEND_URL = 'http://localhost:12345';
+            
+            axios.post(`${BACKEND_URL}/product`, data, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }

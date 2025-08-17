@@ -139,10 +139,10 @@ const AddImage = () => {
                                         required
                                     >
                                         <option value="" disabled>Select Picture type</option>
-                                        <option value="restaurant">Restaurant</option>
-                                        <option value="foods">Foods</option>
-                                        <option value="beverages">Beverages</option>
-                                        <option value="deserts">Deserts</option>
+                                        <option value="Fiction">Fiction</option>
+                                        <option value="Non-Fictions">Non-Fiction</option>
+                                        <option value="Childrens Book">Childrens Book</option>
+                                        <option value="Educational Books">Educational Books</option>
                                         <option value="others">Others</option>
                                     </select>
                                     {errors.pictureType && <div className="invalid-feedback">{errors.pictureType}</div>}

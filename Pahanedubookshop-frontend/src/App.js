@@ -15,7 +15,7 @@ import Cart from './Components/Cart/Cart';
 import AddCategory from './Components/Category/AddCategory';
 import ViewCategory from './Components/Category/VIewCategory';
 import Contact from './Components/Contact';
-import AdminDashboard from './Components/Dashboard/AdminDashboard';
+import AdminDashboard from './Components/AdminDashboard/AdminDashboard';
 import CustomerDashboard from './Components/Dashboard/CustomerDashboard';
 import StaffDashboard from './Components/Dashboard/StaffDashboard';
 import AdminFeedback from './Components/Feedback/AdminFeedback';

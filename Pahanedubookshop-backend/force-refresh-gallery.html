@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Force Refresh Gallery Database</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔄 Force Refresh Gallery Database</h1>
+    
+    <div class="section">
+        <h3>Step 1: Clear Existing Gallery Data</h3>
+        <button onclick="clearGalleryData()">Clear All Gallery Data</button>
+        <div id="clear-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 2: Add New Sample Gallery Data</h3>
+        <button onclick="addSampleGalleryData()">Add Sample Gallery Data</button>
+        <div id="add-sample-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 3: Verify Gallery Data</h3>
+        <button onclick="verifyGalleryData()">Verify Gallery Data</button>
+        <div id="verify-result"></div>
+    </div>
+
+    <div class="section">
+        <h3>Step 4: Test Image Display</h3>
+        <button onclick="testImageDisplay()">Test Image Display</button>
+        <div id="test-display-result"></div>
+    </div>
+
+    <script>
+        async function clearGalleryData() {
+            const resultDiv = document.getElementById('clear-result');
+            resultDiv.innerHTML = '<p>Clearing gallery data...</p>';
+            
+            try {
+                // Get all gallery items first
+                const response = await fetch('http://localhost:12345/gallery');
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    // Delete each item
+                    let deletedCount = 0;
+                    for (const item of data) {
+                        try {
+                            await fetch(`http://localhost:12345/gallery/${item.pictureId}`, {
+                                method: 'DELETE'
+                            });
+                            deletedCount++;
+                        } catch (e) {
+                            console.error(`Failed to delete ${item.pictureId}:`, e);
+                        }
+                    }
+                    
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Gallery Data Cleared!</h4>
+                            <p>Deleted ${deletedCount} items</p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ No Gallery Data to Clear</h4>
+                            <p>Gallery is already empty</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Clear Gallery Data!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function addSampleGalleryData() {
+            const resultDiv = document.getElementById('add-sample-result');
+            resultDiv.innerHTML = '<p>Adding sample gallery data...</p>';
+            
+            const sampleData = [
+                { pictureType: 'Fiction', picturePath: 'book1.jpg' },
+                { pictureType: 'Non-Fiction', picturePath: 'book2.jpg' },
+                { pictureType: 'Academic', picturePath: 'book3.jpg' },
+                { pictureType: 'Children', picturePath: 'book4.jpg' }
+            ];
+            
+            try {
+                let addedCount = 0;
+                for (const item of sampleData) {
+                    const formData = new FormData();
+                    formData.append('pictureType', item.pictureType);
+                    
+                    // Create a dummy file since we can't create a real file object
+                    const dummyFile = new Blob(['dummy'], { type: 'image/jpeg' });
+                    formData.append('picturePath', dummyFile, item.picturePath);
+                    
+                    const response = await fetch('http://localhost:12345/gallery', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        addedCount++;
+                    }
+                }
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Sample Gallery Data Added!</h4>
+                        <p>Added ${addedCount} items</p>
+                        <p>Note: These are placeholder entries. You'll need to upload real images.</p>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Add Sample Data!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function verifyGalleryData() {
+            const resultDiv = document.getElementById('verify-result');
+            resultDiv.innerHTML = '<p>Verifying gallery data...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/gallery');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Gallery Data Verified!</h4>
+                        <p>Total items: ${Array.isArray(data) ? data.length : 'Not an array'}</p>
+                        <p>Data:</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Verify Gallery Data!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testImageDisplay() {
+            const resultDiv = document.getElementById('test-display-result');
+            resultDiv.innerHTML = '<p>Testing image display...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/gallery');
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    let html = '<h4>Testing Image Display:</h4>';
+                    
+                    data.forEach((image, index) => {
+                        const imageUrl = `http://localhost:12345/images/${image.pictureImage || image.picturePath || 'default.jpg'}`;
+                        html += `
+                            <div style="margin: 20px; padding: 15px; border: 1px solid #ddd;">
+                                <h5>Image ${index + 1}: ${image.pictureId}</h5>
+                                <p><strong>Type:</strong> ${image.pictureType}</p>
+                                <p><strong>Name:</strong> ${image.pictureName}</p>
+                                <p><strong>Image Field:</strong> ${image.pictureImage || 'null'}</p>
+                                <p><strong>Path Field:</strong> ${image.picturePath || 'null'}</p>
+                                <p><strong>URL:</strong> ${imageUrl}</p>
+                                <img src="${imageUrl}" alt="${image.pictureName}" style="max-width: 200px; max-height: 200px; border: 1px solid #ddd;" 
+                                     onerror="this.style.border='2px solid red'; this.alt='IMAGE FAILED TO LOAD'; this.title='Failed to load: ' + this.src"
+                                     onload="this.style.border='2px solid green'; this.title='Image loaded successfully'">
+                            </div>
+                        `;
+                    });
+                    
+                    resultDiv.innerHTML = html;
+                } else {
+                    resultDiv.innerHTML = '<div class="error">No gallery data found to test</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Failed to Test Image Display!</h4>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

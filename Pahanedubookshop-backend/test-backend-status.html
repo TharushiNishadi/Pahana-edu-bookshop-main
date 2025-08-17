@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Status Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background: white; border-radius: 5px; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        img { max-width: 200px; border: 1px solid #999; margin: 10px; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Backend Status & Image Test</h1>
+    
+    <div class="test">
+        <h3>Test 1: Backend Connection</h3>
+        <button onclick="testBackend()">Test Backend Connection</button>
+        <div id="backendResult" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Images Directory Status</h3>
+        <button onclick="testImagesStatus()">Check Images Directory</button>
+        <div id="imagesStatusResult" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Create Test Image</h3>
+        <button onclick="createTestImage()">Create Test Image</button>
+        <div id="createImageResult" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 4: Test Image Display</h3>
+        <p>Testing image: <strong>test-image.jpg</strong></p>
+        <img src="http://localhost:12345/images/test-image.jpg" 
+             alt="Test Image" 
+             onload="showResult('testImageResult', '✅ Test image loaded successfully!', 'success')"
+             onerror="showResult('testImageResult', '❌ Test image failed to load', 'error')">
+        <div id="testImageResult" class="result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 5: Gallery Images Test</h3>
+        <p>Testing gallery images from database:</p>
+        <div id="galleryImagesResult" class="result"></div>
+        <button onclick="testGalleryImages()">Test Gallery Images</button>
+    </div>
+
+    <script>
+        function showResult(elementId, message, type) {
+            document.getElementById(elementId).innerHTML = `<span class="${type}">${message}</span>`;
+        }
+        
+        async function testBackend() {
+            try {
+                const response = await fetch('http://localhost:12345/');
+                if (response.ok) {
+                    const text = await response.text();
+                    showResult('backendResult', '✅ Backend is running!<br><br><strong>Response:</strong><br>' + text.substring(0, 200) + '...', 'success');
+                } else {
+                    showResult('backendResult', '❌ Backend error: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('backendResult', '❌ Cannot connect to backend: ' + error.message, 'error');
+            }
+        }
+        
+        async function testImagesStatus() {
+            try {
+                const response = await fetch('http://localhost:12345/test-images-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    let result = '✅ Images directory status:<br><br>';
+                    result += '<strong>Current Directory:</strong> ' + data.currentWorkingDirectory + '<br><br>';
+                    
+                    if (data.directories) {
+                        data.directories.forEach(dir => {
+                            result += `<strong>${dir.path}:</strong> ${dir.exists ? '✅ Exists' : '❌ Missing'} `;
+                            result += `(${dir.fileCount || 0} files)<br>`;
+                            if (dir.files && dir.files.length > 0) {
+                                result += 'Files: ' + dir.files.join(', ') + '<br>';
+                            }
+                            result += '<br>';
+                        });
+                    }
+                    
+                    showResult('imagesStatusResult', result, 'info');
+                } else {
+                    showResult('imagesStatusResult', '❌ Failed to get images status: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('imagesStatusResult', '❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function createTestImage() {
+            try {
+                const response = await fetch('http://localhost:12345/test-create-image');
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('createImageResult', '✅ Test image created: ' + data.filename + '<br>Path: ' + data.filePath + '<br>Size: ' + data.fileSize + ' bytes', 'success');
+                    // Refresh the test image
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showResult('createImageResult', '❌ Failed to create test image: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('createImageResult', '❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        async function testGalleryImages() {
+            try {
+                const response = await fetch('http://localhost:12345/gallery');
+                if (response.ok) {
+                    const data = await response.json();
+                    let result = '✅ Gallery images found: ' + data.length + '<br><br>';
+                    
+                    data.forEach((image, index) => {
+                        result += `<strong>Image ${index + 1}:</strong><br>`;
+                        result += `ID: ${image.pictureId}<br>`;
+                        result += `Type: ${image.pictureType}<br>`;
+                        result += `Path: ${image.picturePath}<br>`;
+                        result += `Name: ${image.pictureName}<br>`;
+                        
+                        // Test if this image can be loaded
+                        if (image.picturePath) {
+                            result += `<img src="http://localhost:12345/images/${image.picturePath}" 
+                                          alt="${image.pictureType}" 
+                                          style="max-width: 100px; border: 1px solid #ccc; margin: 5px;"
+                                          onload="this.style.borderColor='green'"
+                                          onerror="this.style.borderColor='red'; this.alt='❌ Failed to load'">`;
+                        }
+                        result += '<br><br>';
+                    });
+                    
+                    showResult('galleryImagesResult', result, 'info');
+                } else {
+                    showResult('galleryImagesResult', '❌ Failed to get gallery images: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('galleryImagesResult', '❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-test backend on load
+        window.onload = function() {
+            setTimeout(testBackend, 500);
+        };
+    </script>
+</body>
+</html>

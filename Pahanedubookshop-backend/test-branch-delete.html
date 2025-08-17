@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Branch Delete</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; }
+        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 3px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Branch Delete Test</h1>
+    
+    <div class="test-section">
+        <h3>1. Test Backend Connection</h3>
+        <button onclick="testConnection()">Test Connection</button>
+        <div id="connectionResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Get All Branches</h3>
+        <button onclick="getAllBranches()">Get Branches</button>
+        <div id="branchesResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Test Branch Delete</h3>
+        <input type="text" id="branchIdToDelete" placeholder="Enter Branch ID to delete">
+        <button onclick="testDeleteBranch()">Delete Branch</button>
+        <div id="deleteResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Test Branch Update</h3>
+        <input type="text" id="branchIdToUpdate" placeholder="Enter Branch ID to update">
+        <input type="text" id="newBranchName" placeholder="New Branch Name">
+        <input type="text" id="newBranchAddress" placeholder="New Branch Address">
+        <button onclick="testUpdateBranch()">Update Branch</button>
+        <div id="updateResult" class="result"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+
+        function showResult(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${isSuccess ? 'success' : 'error'}`;
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/test-branch`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('connectionResult', `✅ Connection successful: ${data.message}`, true);
+                } else {
+                    showResult('connectionResult', `❌ Connection failed: ${response.status} ${response.statusText}`, false);
+                }
+            } catch (error) {
+                showResult('connectionResult', `❌ Connection error: ${error.message}`, false);
+            }
+        }
+
+        async function getAllBranches() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/branch`);
+                
+                if (response.ok) {
+                    const branches = await response.json();
+                    showResult('branchesResult', `✅ Found ${branches.length} branches: ${JSON.stringify(branches, null, 2)}`, true);
+                } else {
+                    showResult('branchesResult', `❌ Failed to get branches: ${response.status} ${response.statusText}`, false);
+                }
+            } catch (error) {
+                showResult('branchesResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        async function testDeleteBranch() {
+            const branchId = document.getElementById('branchIdToDelete').value.trim();
+            if (!branchId) {
+                showResult('deleteResult', '❌ Please enter a Branch ID', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/branch/${branchId}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('deleteResult', `✅ Branch deleted successfully: ${data.message}`, true);
+                } else {
+                    const errorData = await response.json();
+                    showResult('deleteResult', `❌ Delete failed: ${errorData.error || response.statusText}`, false);
+                }
+            } catch (error) {
+                showResult('deleteResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+
+        async function testUpdateBranch() {
+            const branchId = document.getElementById('branchIdToUpdate').value.trim();
+            const branchName = document.getElementById('newBranchName').value.trim();
+            const branchAddress = document.getElementById('newBranchAddress').value.trim();
+            
+            if (!branchId || !branchName || !branchAddress) {
+                showResult('updateResult', '❌ Please fill all fields', false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/branch/${branchId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        branchName: branchName,
+                        branchAddress: branchAddress
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('updateResult', `✅ Branch updated successfully: ${data.message}`, true);
+                } else {
+                    const errorData = await response.json();
+                    showResult('updateResult', `❌ Update failed: ${errorData.error || response.statusText}`, false);
+                }
+            } catch (error) {
+                showResult('updateResult', `❌ Error: ${error.message}`, false);
+            }
+        }
+    </script>
+</body>
+</html>

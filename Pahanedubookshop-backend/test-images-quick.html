@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Image Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        img { max-width: 200px; border: 1px solid #999; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Quick Image Test</h1>
+    
+    <div class="test">
+        <h3>Test 1: Backend Status</h3>
+        <button onclick="testBackend()">Test Backend</button>
+        <div id="backendResult"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Image Serving</h3>
+        <p>Testing image: <strong>fiction.jpg</strong></p>
+        <img src="http://localhost:12345/images/fiction.jpg" 
+             alt="Fiction" 
+             onload="showResult('imageResult', '✅ Image loaded successfully!', 'success')"
+             onerror="showResult('imageResult', '❌ Image failed to load', 'error')">
+        <div id="imageResult"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Create Test Image</h3>
+        <button onclick="createTestImage()">Create Test Image</button>
+        <div id="createResult"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 4: Test Image Display</h3>
+        <img src="http://localhost:12345/images/test-image.jpg" 
+             alt="Test Image" 
+             onload="showResult('testImageResult', '✅ Test image loaded!', 'success')"
+             onerror="showResult('testImageResult', '❌ Test image not found', 'error')">
+        <div id="testImageResult"></div>
+    </div>
+
+    <script>
+        function showResult(elementId, message, type) {
+            document.getElementById(elementId).innerHTML = `<span class="${type}">${message}</span>`;
+        }
+        
+        async function testBackend() {
+            try {
+                const response = await fetch('http://localhost:12345/');
+                if (response.ok) {
+                    showResult('backendResult', '✅ Backend is running!', 'success');
+                } else {
+                    showResult('backendResult', '❌ Backend error: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('backendResult', '❌ Cannot connect to backend: ' + error.message, 'error');
+            }
+        }
+        
+        async function createTestImage() {
+            try {
+                const response = await fetch('http://localhost:12345/test-create-image');
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('createResult', '✅ Test image created: ' + data.filename, 'success');
+                    // Refresh the test image
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    showResult('createResult', '❌ Failed to create test image: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', '❌ Error: ' + error.message, 'error');
+            }
+        }
+        
+        // Auto-test backend on load
+        window.onload = function() {
+            setTimeout(testBackend, 500);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Branch Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 16px; }
+        input:focus { border-color: #007bff; outline: none; }
+        button { background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; width: 100%; }
+        button:hover { background: #0056b3; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .result { margin-top: 20px; padding: 15px; border-radius: 5px; font-weight: bold; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .loading { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏢 Add New Branch</h1>
+        <p>This will test if the backend is working correctly.</p>
+        
+        <form id="branchForm">
+            <div class="form-group">
+                <label for="branchName">Branch Name *</label>
+                <input type="text" id="branchName" name="branchName" placeholder="Enter branch name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="branchAddress">Branch Address *</label>
+                <input type="text" id="branchAddress" name="branchAddress" placeholder="Enter branch address" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="branchPhone">Phone Number</label>
+                <input type="tel" id="branchPhone" name="branchPhone" placeholder="Enter phone number (optional)">
+            </div>
+            
+            <div class="form-group">
+                <label for="branchEmail">Email</label>
+                <input type="email" id="branchEmail" name="branchEmail" placeholder="Enter email (optional)">
+            </div>
+            
+            <button type="submit" id="submitBtn">➕ Add Branch</button>
+        </form>
+        
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        document.getElementById('branchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const resultDiv = document.getElementById('result');
+            
+            // Get form data
+            const formData = {
+                branchName: document.getElementById('branchName').value.trim(),
+                branchAddress: document.getElementById('branchAddress').value.trim(),
+                branchPhone: document.getElementById('branchPhone').value.trim() || '',
+                branchEmail: document.getElementById('branchEmail').value.trim() || ''
+            };
+            
+            // Validate required fields
+            if (!formData.branchName || !formData.branchAddress) {
+                showResult('❌ Please fill in all required fields (Branch Name and Address)', 'error');
+                return;
+            }
+            
+            // Show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = '🔄 Adding Branch...';
+            showResult('🔄 Adding branch to database...', 'loading');
+            
+            try {
+                console.log('Sending request to:', `${BACKEND_URL}/branch`);
+                console.log('Request data:', formData);
+                
+                const response = await fetch(`${BACKEND_URL}/branch`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                
+                if (response.ok) {
+                    const newBranch = await response.json();
+                    console.log('Branch created successfully:', newBranch);
+                    
+                    // Show success message
+                    showResult(`✅ Branch added successfully! 🎉\n\nBranch ID: ${newBranch.branchId}\nBranch Name: ${newBranch.branchName}\nAddress: ${newBranch.branchAddress}`, 'success');
+                    
+                    // Reset form
+                    document.getElementById('branchForm').reset();
+                    
+                    // Show success notification
+                    showSuccessNotification();
+                    
+                } else {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    
+                    let errorMessage = `❌ Failed to add branch: ${response.status} ${response.statusText}`;
+                    
+                    try {
+                        const errorData = JSON.parse(errorText);
+                        errorMessage += `\n\nError: ${errorData.error || errorData.message || 'Unknown error'}`;
+                    } catch (e) {
+                        errorMessage += `\n\nError: ${errorText}`;
+                    }
+                    
+                    showResult(errorMessage, 'error');
+                }
+                
+            } catch (error) {
+                console.error('Network error:', error);
+                showResult(`❌ Network error: ${error.message}\n\nMake sure your backend server is running on port 12345!`, 'error');
+            } finally {
+                // Reset button
+                submitBtn.disabled = false;
+                submitBtn.textContent = '➕ Add Branch';
+            }
+        });
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+        
+        function showSuccessNotification() {
+            // Create a beautiful success notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                z-index: 1000;
+                animation: slideIn 0.5s ease-out;
+                max-width: 300px;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="font-size: 24px;">🎉</div>
+                    <div>
+                        <div style="font-weight: bold; margin-bottom: 5px;">Success!</div>
+                        <div style="font-size: 14px;">Branch added successfully</div>
+                    </div>
+                </div>
+            `;
+            
+            // Add CSS animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.5s ease-in';
+                setTimeout(() => notification.remove(), 500);
+            }, 5000);
+            
+            // Add slideOut animation
+            const slideOutStyle = document.createElement('style');
+            slideOutStyle.textContent = `
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(slideOutStyle);
+        }
+        
+        // Test backend connection on page load
+        window.addEventListener('load', async function() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/test-branch`, { method: 'POST' });
+                if (response.ok) {
+                    console.log('✅ Backend connection successful');
+                } else {
+                    console.log('❌ Backend connection failed:', response.status);
+                }
+            } catch (error) {
+                console.log('❌ Backend connection error:', error.message);
+            }
+        });
+    </script>
+</body>
+</html>

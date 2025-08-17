@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Create Missing Gallery Images</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .image-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .image-preview { max-width: 200px; border: 2px solid #007bff; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; font-weight: bold; }
+        .error { color: red; font-weight: bold; }
+        button { padding: 10px 20px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .download-link { display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px; margin: 5px; }
+        .download-link:hover { background: #218838; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Create Missing Gallery Images</h1>
+        <p>This page will create the missing gallery images that are referenced in your database:</p>
+        
+        <div class="image-section">
+            <h3>1. Fiction Gallery Image</h3>
+            <canvas id="fictionCanvas" width="300" height="200" style="border: 1px solid #ccc;"></canvas>
+            <br>
+            <button onclick="createFictionImage()">Create Fiction Image</button>
+            <div id="fictionResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>2. Non-Fiction Gallery Image</h3>
+            <canvas id="nonFictionCanvas" width="300" height="200" style="border: 1px solid #ccc;"></canvas>
+            <br>
+            <button onclick="createNonFictionImage()">Create Non-Fiction Image</button>
+            <div id="nonFictionResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>3. Academic Gallery Image</h3>
+            <canvas id="academicCanvas" width="300" height="200" style="border: 1px solid #ccc;"></canvas>
+            <br>
+            <button onclick="createAcademicImage()">Create Academic Image</button>
+            <div id="academicResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>4. Children Gallery Image</h3>
+            <canvas id="childrenCanvas" width="300" height="200" style="border: 1px solid #ccc;"></canvas>
+            <br>
+            <button onclick="createChildrenImage()">Create Children Image</button>
+            <div id="childrenResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>5. Create All Images at Once</h3>
+            <button onclick="createAllImages()">Create All Missing Images</button>
+            <div id="allImagesResult"></div>
+        </div>
+        
+        <div class="image-section">
+            <h3>6. Test Backend Image Serving</h3>
+            <button onclick="testBackendImages()">Test Backend Images</button>
+            <div id="backendTestResult"></div>
+        </div>
+    </div>
+
+    <script>
+        function createImage(canvas, title, color, icon) {
+            const ctx = canvas.getContext('2d');
+            
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Background
+            ctx.fillStyle = color;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Title text
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 24px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, canvas.width/2, 80);
+            
+            // Subtitle
+            ctx.font = '16px Arial';
+            ctx.fillText('Gallery Image', canvas.width/2, 110);
+            
+            // Icon
+            ctx.font = '48px Arial';
+            ctx.fillText(icon, canvas.width/2, 160);
+            
+            // Border
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(5, 5, canvas.width-10, canvas.height-10);
+        }
+        
+        function createFictionImage() {
+            createImage(document.getElementById('fictionCanvas'), 'Fiction Books', '#e74c3c', '📚');
+            downloadCanvas('fictionCanvas', 'fiction-gallery.jpg', 'fictionResult');
+        }
+        
+        function createNonFictionImage() {
+            createImage(document.getElementById('nonFictionCanvas'), 'Non-Fiction Books', '#3498db', '📖');
+            downloadCanvas('nonFictionCanvas', 'non-fiction-gallery.jpg', 'nonFictionResult');
+        }
+        
+        function createAcademicImage() {
+            createImage(document.getElementById('academicCanvas'), 'Academic Books', '#9b59b6', '🎓');
+            downloadCanvas('academicCanvas', 'academic-gallery.jpg', 'academicResult');
+        }
+        
+        function createChildrenImage() {
+            createImage(document.getElementById('childrenCanvas'), 'Children Books', '#f39c12', '🧸');
+            downloadCanvas('childrenCanvas', 'children-gallery.jpg', 'childrenResult');
+        }
+        
+        function downloadCanvas(canvasId, filename, resultId) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = `
+                <span class="success">✅ Image created successfully!</span><br>
+                <a href="${link.href}" download="${filename}" class="download-link">Download ${filename}</a>
+                <br><small>Save this file to your backend's 'images' folder</small>
+            `;
+        }
+        
+        function createAllImages() {
+            createFictionImage();
+            setTimeout(() => createNonFictionImage(), 100);
+            setTimeout(() => createAcademicImage(), 200);
+            setTimeout(() => createChildrenImage(), 300);
+            
+            document.getElementById('allImagesResult').innerHTML = `
+                <span class="success">✅ All images created!</span><br>
+                <p><strong>Next steps:</strong></p>
+                <ol>
+                    <li>Download all 4 images above</li>
+                    <li>Save them to your backend's 'images' folder</li>
+                    <li>Restart your backend server</li>
+                    <li>Test the gallery page again</li>
+                </ol>
+            `;
+        }
+        
+        async function testBackendImages() {
+            const resultDiv = document.getElementById('backendTestResult');
+            resultDiv.innerHTML = 'Testing backend images...';
+            
+            const images = [
+                'fiction-gallery.jpg',
+                'non-fiction-gallery.jpg', 
+                'academic-gallery.jpg',
+                'children-gallery.jpg'
+            ];
+            
+            let results = '';
+            
+            for (const image of images) {
+                try {
+                    const response = await fetch(`http://localhost:12345/images/${image}`);
+                    if (response.ok) {
+                        results += `<span class="success">✅ ${image} - Found</span><br>`;
+                    } else {
+                        results += `<span class="error">❌ ${image} - Not found (${response.status})</span><br>`;
+                    }
+                } catch (error) {
+                    results += `<span class="error">❌ ${image} - Error: ${error.message}</span><br>`;
+                }
+            }
+            
+            resultDiv.innerHTML = results;
+        }
+        
+        // Create all images on page load
+        window.onload = function() {
+            setTimeout(createAllImages, 500);
+        };
+    </script>
+</body>
+</html>

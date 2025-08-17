@@ -20,7 +20,7 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     axios
-      .get('/user')
+      .get('/users')
       .then((response) => {
         setUsers(response.data);
         setLoading(false);
@@ -48,7 +48,7 @@ const AdminDashboard = () => {
 
   const handleUpdateUser = () => {
     axios
-      .get('/user')
+      .get('/users')
       .then((response) => {
         setUsers(response.data);
         setShowModal(false);
@@ -67,7 +67,7 @@ const AdminDashboard = () => {
     if (!userToDelete) return;
 
     axios
-      .delete(`/user/${userToDelete}`)
+      .delete(`/users/${userToDelete}`)
       .then(() => {
         setUsers(prevUsers => prevUsers.filter(user => user.userId !== userToDelete));
         setShowDeleteModal(false);

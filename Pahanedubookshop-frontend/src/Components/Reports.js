@@ -33,21 +33,49 @@ const Reports = () => {
       const formattedEndDate = `${endDate}T00:00:00`;
 
       const response = await axios.get(`/orders/sales-report`, {
-        params: { startDate: formattedStartDate, endDate: formattedEndDate },
-        responseType: 'arraybuffer'
+        params: { startDate: formattedStartDate, endDate: formattedEndDate }
       });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      
+      // Display sales report data
+      const reportData = response.data;
+      let reportContent = `📊 Sales Report\n\n`;
+      reportContent += `📅 Period: ${startDate} to ${endDate}\n`;
+      reportContent += `📈 Total Orders: ${reportData.totalOrders}\n`;
+      reportContent += `💰 Total Revenue: Rs. ${reportData.totalRevenue?.toFixed(2) || '0.00'}\n`;
+      reportContent += `🕒 Generated: ${new Date(reportData.generatedAt).toLocaleString()}\n\n`;
+      
+      if (reportData.salesData && reportData.salesData.length > 0) {
+        reportContent += `📋 Sales Details:\n`;
+        reportData.salesData.forEach((sale, index) => {
+          reportContent += `${index + 1}. Order ${sale.orderId} - ${sale.customerName}\n`;
+          reportContent += `   Product: ${sale.productName} x${sale.quantity} @ Rs.${sale.price}\n`;
+          reportContent += `   Total: Rs.${sale.totalAmount} (${sale.status})\n\n`;
+        });
+      } else {
+        reportContent += `No sales data found for the selected period.`;
+      }
+      
+      Swal.fire({
+        title: 'Sales Report Generated!',
+        text: reportContent,
+        icon: 'success',
+        confirmButtonColor: '#A69003',
+        width: '600px',
+        customClass: {
+          popup: 'text-left'
+        }
+      });
+      
     } catch (error) {
       console.error("Error generating sales report", error);
+      const errorMessage = error.response?.data?.error || 'Failed to generate sales report!';
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to generate sales report!',
+        text: errorMessage,
         confirmButtonColor: '#A69003',
         showConfirmButton: false,
-        timer: 2000,
+        timer: 3000,
         timerProgressBar: true
       });
     }
@@ -61,21 +89,49 @@ const Reports = () => {
       const formattedEndDate = `${endDate}T00:00:00`;
 
       const response = await axios.get(`/orders/financial-report`, {
-        params: { startDate: formattedStartDate, endDate: formattedEndDate },
-        responseType: 'arraybuffer'
+        params: { startDate: formattedStartDate, endDate: formattedEndDate }
       });
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      window.open(url, '_blank');
+      
+      // Display financial report data
+      const reportData = response.data;
+      const financialData = reportData.financialData;
+      
+      let reportContent = `💰 Financial Report\n\n`;
+      reportContent += `📅 Period: ${startDate} to ${endDate}\n`;
+      reportContent += `📊 Total Revenue: Rs. ${financialData.totalRevenue?.toFixed(2) || '0.00'}\n`;
+      reportContent += `📦 Total Orders: ${financialData.orderCount || 0}\n`;
+      reportContent += `📈 Average Order Value: Rs. ${financialData.avgOrderValue?.toFixed(2) || '0.00'}\n`;
+      reportContent += `🕒 Generated: ${new Date(reportData.generatedAt).toLocaleString()}\n\n`;
+      
+      if (financialData.topProducts && financialData.topProducts.length > 0) {
+        reportContent += `🏆 Top Selling Products:\n`;
+        financialData.topProducts.forEach((product, index) => {
+          reportContent += `${index + 1}. ${product.productName}\n`;
+          reportContent += `   Quantity: ${product.totalQuantity} | Revenue: Rs.${product.totalRevenue?.toFixed(2)}\n\n`;
+        });
+      }
+      
+      Swal.fire({
+        title: 'Financial Report Generated!',
+        text: reportContent,
+        icon: 'success',
+        confirmButtonColor: '#A69003',
+        width: '600px',
+        customClass: {
+          popup: 'text-left'
+        }
+      });
+      
     } catch (error) {
       console.error("Error generating financial report", error);
+      const errorMessage = error.response?.data?.error || 'Failed to generate financial report!';
       Swal.fire({
         icon: 'error',
         title: 'Error',
-        text: 'Failed to generate financial report!',
+        text: errorMessage,
         confirmButtonColor: '#A69003',
         showConfirmButton: false,
-        timer: 2000,
+        timer: 3000,
         timerProgressBar: true
       });
     }

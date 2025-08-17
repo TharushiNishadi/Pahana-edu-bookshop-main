@@ -91,6 +91,8 @@ const AdminViewProduct = () => {
       <div className="gallery-container">
         <SideNavigation />
         <div className="add-user-container">
+          <h1 className="form-head">Product Management</h1>
+          
           {loading ? (
             <p>Loading...</p>
           ) : error ? (

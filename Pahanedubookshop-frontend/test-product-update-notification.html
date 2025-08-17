@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Product Update Notification</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success-btn {
+            background: #28a745;
+        }
+        .success-btn:hover {
+            background: #218838;
+        }
+        .error-btn {
+            background: #dc3545;
+        }
+        .error-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Product Update Notifications</h1>
+        <p>This page tests the SweetAlert2 notifications that will appear when editing products.</p>
+        
+        <h3>Test Notifications:</h3>
+        <button onclick="testSuccessNotification()" class="success-btn">
+            ✏️ Test Product Update Success
+        </button>
+        
+        <button onclick="testErrorNotification()" class="error-btn">
+            ❌ Test Product Update Error
+        </button>
+        
+        <button onclick="testValidationError()">
+            ⚠️ Test Validation Error
+        </button>
+        
+        <h3>What You'll See:</h3>
+        <ul>
+            <li><strong>Success Notification:</strong> Beautiful green toast notification that auto-hides after 3 seconds</li>
+            <li><strong>Error Notification:</strong> Red error modal that requires clicking OK</li>
+            <li><strong>Validation Error:</strong> Red error modal for form validation issues</li>
+        </ul>
+        
+        <h3>In Your App:</h3>
+        <p>When you edit a product successfully, you'll see the same success notification that appears in the top-right corner with a smooth animation!</p>
+    </div>
+
+    <script>
+        function testSuccessNotification() {
+            Swal.fire({
+                title: 'Success! ✏️',
+                text: 'Product "Test Product" updated successfully!',
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end',
+                showClass: { 
+                    popup: 'animate__animated animate__fadeInDown' 
+                },
+                hideClass: { 
+                    popup: 'animate__animated animate__fadeOutUp' 
+                }
+            });
+        }
+        
+        function testErrorNotification() {
+            Swal.fire({
+                title: 'Error! ❌',
+                text: 'Failed to update product. Server connection error.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+        
+        function testValidationError() {
+            Swal.fire({
+                title: 'Error! ❌',
+                text: 'Please fill all required fields.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    </script>
+</body>
+</html>

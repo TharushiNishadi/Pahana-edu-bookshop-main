@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Category Multipart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Category Multipart Functionality</h1>
+    
+    <div class="test-section">
+        <h2>📝 Test Category Creation</h2>
+        <form id="categoryForm">
+            <div class="form-group">
+                <label for="categoryName">Category Name *</label>
+                <input type="text" id="categoryName" name="categoryName" value="Test Category" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoryDescription">Category Description *</label>
+                <textarea id="categoryDescription" name="categoryDescription" rows="3" required>This is a test category description</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoryImage">Category Image *</label>
+                <input type="file" id="categoryImage" name="categoryImage" accept="image/*" required>
+            </div>
+            
+            <button type="submit">🚀 Create Category</button>
+        </form>
+        
+        <div id="categoryResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🔍 Test Multipart Parsing</h2>
+        <button onclick="testMultipartParsing()">🧪 Test Multipart Parsing</button>
+        <div id="multipartResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Test Database Connection</h2>
+        <button onclick="testDatabase()">🔌 Test Database</button>
+        <div id="dbResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Test Simple Category Creation</h2>
+        <button onclick="testSimpleCategoryCreation()">🚀 Test Simple Category Creation</button>
+        <div id="simpleCategoryResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Test Simple Category (Hardcoded)</h2>
+        <button onclick="testSimpleCategoryHardcoded()">🚀 Test Simple Category (Hardcoded)</button>
+        <div id="simpleCategoryHardcodedResult" class="result" style="display: none;"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📋 View All Categories</h2>
+        <button onclick="viewCategories()">👁️ View Categories</button>
+        <div id="categoriesResult" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        // Test Category Creation
+        document.getElementById('categoryForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('categoryName', document.getElementById('categoryName').value);
+            formData.append('categoryDescription', document.getElementById('categoryDescription').value);
+            formData.append('categoryImage', document.getElementById('categoryImage').files[0]);
+            
+            const resultDiv = document.getElementById('categoryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Creating category...';
+            
+            try {
+                const response = await fetch('/category', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Category created successfully!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Failed to create category!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        });
+        
+        // Test Multipart Parsing
+        async function testMultipartParsing() {
+            const formData = new FormData();
+            formData.append('testField', 'testValue');
+            formData.append('testFile', new File(['test content'], 'test.txt'));
+            
+            const resultDiv = document.getElementById('multipartResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Testing multipart parsing...';
+            
+            try {
+                const response = await fetch('/test-multipart', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Multipart parsing successful!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Multipart parsing failed!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        // Test Database Connection
+        async function testDatabase() {
+            const resultDiv = document.getElementById('dbResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Testing database connection...';
+            
+            try {
+                const response = await fetch('/test-category-db');
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Database test successful!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Database test failed!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        // View All Categories
+        async function viewCategories() {
+            const resultDiv = document.getElementById('categoriesResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Fetching categories...';
+            
+            try {
+                const response = await fetch('/category');
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Categories fetched successfully!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Failed to fetch categories!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+        
+        // Test Simple Category Creation (without multipart)
+        async function testSimpleCategoryCreation() {
+            const resultDiv = document.getElementById('simpleCategoryResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Testing simple category creation...';
+            
+            const testData = {
+                categoryName: 'Test Category ' + Date.now(),
+                categoryDescription: 'This is a test category created without multipart data',
+                categoryImage: 'test-image.jpg'
+            };
+            
+            try {
+                const response = await fetch('/test-create-category', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Simple category creation successful!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Simple category creation failed!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+
+        // Test Simple Category (Hardcoded)
+        async function testSimpleCategoryHardcoded() {
+            const resultDiv = document.getElementById('simpleCategoryHardcodedResult');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'result';
+            resultDiv.textContent = 'Testing simple category (hardcoded) creation...';
+            
+            try {
+                const response = await fetch('/test-simple-category', {
+                    method: 'GET'
+                });
+                
+                const result = await response.text();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ Simple category (hardcoded) creation successful!\n\nResponse: ${result}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `❌ Simple category (hardcoded) creation failed!\n\nStatus: ${response.status}\nResponse: ${result}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `❌ Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

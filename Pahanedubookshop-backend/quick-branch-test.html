@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Branch Test</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        button { padding: 15px; margin: 10px; font-size: 16px; }
+        .result { margin: 20px; padding: 15px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Quick Branch Test</h1>
+    
+    <button onclick="testBackend()">Test Backend Connection</button>
+    <button onclick="testGetBranches()">Test GET /branch</button>
+    <button onclick="testCreateBranch()">Test Create Branch</button>
+    
+    <div id="result" class="result info">Click a button to test...</div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        function showResult(message, type = 'info') {
+            document.getElementById('result').textContent = message;
+            document.getElementById('result').className = `result ${type}`;
+        }
+        
+        async function testBackend() {
+            try {
+                showResult('🔄 Testing backend connection...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-branch`, { method: 'POST' });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Backend working!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Backend failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Connection error: ${error.message}\n\nBackend not running on port 12345!`, 'error');
+            }
+        }
+        
+        async function testGetBranches() {
+            try {
+                showResult('🔄 Testing GET /branch...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/branch`);
+                
+                if (response.ok) {
+                    const branches = await response.json();
+                    showResult(`✅ GET /branch working!\n\nFound ${branches.length} branches:\n${JSON.stringify(branches, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ GET /branch failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCreateBranch() {
+            try {
+                showResult('🔄 Testing POST /branch...', 'info');
+                
+                const testBranch = {
+                    branchName: "Test Branch " + Date.now(),
+                    branchAddress: "Test Address " + Date.now()
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/branch`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testBranch)
+                });
+                
+                if (response.ok) {
+                    const newBranch = await response.json();
+                    showResult(`✅ Branch created successfully! 🎉\n\nNew branch: ${JSON.stringify(newBranch, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Create branch failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

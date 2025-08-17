@@ -16,26 +16,29 @@ const ProductView = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     const userId = user ? user.userId : null;
 
+    // Backend base URL
+    const BACKEND_URL = 'http://localhost:12345';
+
     useEffect(() => {
         const fetchProducts = async () => {
             try {
-                const response = await axios.get(`/product/byCategory?categoryName=${encodeURIComponent(categoryName)}`);
+                const response = await axios.get(`${BACKEND_URL}/product/byCategory?categoryName=${encodeURIComponent(categoryName)}`);
                 setProducts(response.data);
 
-                const storedFavorites = await fetchFavoriteProducts();
-                setFavorites(new Set(storedFavorites));
+                const fetchFavoriteProducts = async () => {
+                    try {
+                        const response = await axios.get(`${BACKEND_URL}/api/favorites/list?userId=${userId}`);
+                        setFavorites(new Set(response.data));
+                    } catch (error) {
+                        console.error('Error fetching favorite products:', error);
+                    }
+                };
+
+                if (userId) {
+                    fetchFavoriteProducts();
+                }
             } catch (error) {
                 console.error('Error fetching products:', error);
-            }
-        };
-
-        const fetchFavoriteProducts = async () => {
-            try {
-                const response = await axios.get(`/api/favorites/list?userId=${userId}`);
-                return response.data || [];
-            } catch (error) {
-                console.error('Error fetching favorite products:', error);
-                return [];
             }
         };
 
@@ -69,31 +72,21 @@ const ProductView = () => {
         const currentQuantity = cart[product.productId]?.quantity || 0;
 
         if (currentQuantity > 0) {
-            const newCart = {
-                ...cart,
-                [product.productId]: {
-                    ...product,
-                    quantity: currentQuantity + 1
-                }
-            };
-            setCart(newCart);
-            localStorage.setItem('cart', JSON.stringify(newCart));
-
             try {
-                await axios.post('/api/cart/add', null, {
+                await axios.post(`${BACKEND_URL}/api/cart/add`, null, {
                     params: {
                         userId,
                         productId: product.productId,
-                        quantity: newCart[product.productId].quantity
+                        quantity: currentQuantity
                     }
                 });
-                toast.success('Cart Updated Successfully!');
+                toast.success('Product added to cart successfully!');
             } catch (error) {
                 console.error('Error adding product to cart:', error);
                 toast.error('Error adding product to cart.');
             }
         } else {
-            toast.warn('Quantity must be at least 1');
+            toast.warn('Please select a quantity first using the + button');
         }
     };
 
@@ -108,10 +101,10 @@ const ProductView = () => {
 
         try {
             if (isFavorite) {
-                await axios.post('/api/favorites/remove', null, { params: { userId, productId } });
+                await axios.post(`${BACKEND_URL}/api/favorites/remove`, null, { params: { userId, productId } });
                 newFavorites.delete(productId);
             } else {
-                await axios.post('/api/favorites/add', null, { params: { userId, productId } });
+                await axios.post(`${BACKEND_URL}/api/favorites/add`, null, { params: { userId, productId } });
                 newFavorites.add(productId);
             }
 
@@ -153,7 +146,7 @@ const ProductView = () => {
                         <div className="custom-col" key={product.productId}>
                             <div className="custom-card">
                                 <img
-                                    src={`/images/${product.productImage}`}
+                                    src={`${BACKEND_URL}/images/${product.productImage}`}
                                     className="custom-card-img-top"
                                     alt={product.productName}
                                 />

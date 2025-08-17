@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
+import Swal from 'sweetalert2';
 
 const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
   const [productName, setProductName] = useState(product?.productName || '');
@@ -14,7 +15,10 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    axios.get('/category')
+    // Use the correct backend URL for API calls
+    const BACKEND_URL = 'http://localhost:12345';
+    
+    axios.get(`${BACKEND_URL}/category`)
       .then(response => {
         setCategories(response.data);
       })
@@ -28,7 +32,7 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
       setProductPrice(product.productPrice);
       setProductDescription(product.productDescription);
       setProductImage(null);
-      setImagePreview(product.productImage ? `/images/${product.productImage}` : '');
+      setImagePreview(product.productImage ? `${BACKEND_URL}/images/${product.productImage}` : '');
     }
   }, [product]);
 
@@ -58,7 +62,12 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
     }
 
     if (!productName || !categoryName || !productPrice || !productDescription) {
-      alert('Please fill all required fields.');
+      Swal.fire({
+        title: 'Error! ❌',
+        text: 'Please fill all required fields.',
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
       return;
     }
 
@@ -75,9 +84,26 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
         formData.append('productImage', productImage);
       }
 
-      await axios.put(`/product/${product.productId}`, formData, {
+      await axios.put(`http://localhost:12345/product/${product.productId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      // Show success notification
+      Swal.fire({
+        title: 'Success! ✏️',
+        text: `Product "${productName}" updated successfully!`,
+        icon: 'success',
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end',
+        showClass: { 
+          popup: 'animate__animated animate__fadeInDown' 
+        },
+        hideClass: { 
+          popup: 'animate__animated animate__fadeOutUp' 
         }
       });
 
@@ -85,7 +111,36 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
       handleClose();
     } catch (error) {
       console.error('Error updating product', error);
-      alert('Failed to update product. Please try again.');
+      
+      // Show detailed error information with SweetAlert2
+      let errorMessage = 'Failed to update product. ';
+      if (error.response) {
+        // Backend responded with error
+        const backendError = error.response.data;
+        if (backendError.error) {
+          errorMessage += backendError.error;
+        } else if (backendError.message) {
+          errorMessage += backendError.message;
+        } else {
+          errorMessage += `Status: ${error.response.status}`;
+        }
+        console.error('Backend error details:', backendError);
+      } else if (error.request) {
+        // Request was made but no response received
+        errorMessage += 'No response from server. Please check if backend is running.';
+        console.error('No response received:', error.request);
+      } else {
+        // Something else happened
+        errorMessage += error.message || 'Unknown error occurred.';
+        console.error('Request setup error:', error.message);
+      }
+      
+      Swal.fire({
+        title: 'Error! ❌',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonText: 'OK'
+      });
     } finally {
       setLoading(false);
     }
@@ -180,6 +235,34 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
                   <Button variant="secondary" onClick={handleClose} className="btn btn-secondary">Close</Button>
                   <Button variant="primary" type="submit" className="btn btn-danger" disabled={loading}>
                     {loading ? 'Updating...' : 'Update'}
+                  </Button>
+                  <Button 
+                    variant="outline-warning" 
+                    type="button" 
+                    className="btn btn-outline-warning ms-2"
+                    onClick={() => {
+                      console.log('=== DEBUG PRODUCT UPDATE ===');
+                      console.log('Product ID:', product?.productId);
+                      console.log('Current form data:');
+                      console.log('- productName:', productName);
+                      console.log('- categoryName:', categoryName);
+                      console.log('- productPrice:', productPrice);
+                      console.log('- productDescription:', productDescription);
+                      console.log('- productImage:', productImage);
+                      
+                      // Test the backend endpoint
+                      axios.get(`/test-product-db`)
+                        .then(response => {
+                          console.log('Database test result:', response.data);
+                          alert('Check console for debug info and database test results');
+                        })
+                        .catch(error => {
+                          console.error('Database test failed:', error);
+                          alert('Database test failed! Check console for details.');
+                        });
+                    }}
+                  >
+                    Debug Update
                   </Button>
                 </div>
               </Form>

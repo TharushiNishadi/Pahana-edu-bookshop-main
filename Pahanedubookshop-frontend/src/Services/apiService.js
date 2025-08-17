@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Base API configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
 // Create axios instance with default config
 const apiClient = axios.create({
@@ -55,6 +55,15 @@ export const categoryAPI = {
     create: (data) => apiClient.post('/category', data),
     update: (id, data) => apiClient.put(`/category/${id}`, data),
     delete: (id) => apiClient.delete(`/category/${id}`),
+};
+
+// Users API functions
+export const usersAPI = {
+    getAll: () => apiClient.get('/users'),
+    getById: (id) => apiClient.get(`/users/${id}`),
+    create: (data) => apiClient.post('/users', data),
+    update: (id, data) => apiClient.put(`/users/${id}`, data),
+    delete: (id) => apiClient.delete(`/users/${id}`),
 };
 
 // Auth API functions

@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Gallery Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+        .image-preview { max-width: 200px; max-height: 200px; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>Gallery Debug Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Gallery Database Structure</h3>
+        <button onclick="testGalleryDatabase()">Test Gallery Database</button>
+        <div id="gallery-db-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Get All Gallery Images</h3>
+        <button onclick="testGetAllGalleryImages()">Get All Gallery Images</button>
+        <div id="get-gallery-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Add New Image</h3>
+        <input type="text" id="pictureType" placeholder="Picture Type (e.g., test)" style="width: 200px; margin-right: 10px;">
+        <input type="file" id="pictureFile" accept="image/*" style="margin-right: 10px;">
+        <button onclick="testAddImage()">Add Image</button>
+        <div id="add-image-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Image Display</h3>
+        <div id="image-display-result"></div>
+    </div>
+
+    <script>
+        async function testGalleryDatabase() {
+            const resultDiv = document.getElementById('gallery-db-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/test-gallery-db');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testGetAllGalleryImages() {
+            const resultDiv = document.getElementById('get-gallery-result');
+            resultDiv.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch('http://localhost:12345/gallery');
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <p>Status: ${response.status}</p>
+                        <p>Images found: ${Array.isArray(data) ? data.length : 'Not an array'}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                // Also test image display
+                if (Array.isArray(data) && data.length > 0) {
+                    testImageDisplay(data);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testAddImage() {
+            const resultDiv = document.getElementById('add-image-result');
+            const pictureType = document.getElementById('pictureType').value;
+            const pictureFile = document.getElementById('pictureFile').files[0];
+            
+            if (!pictureType || !pictureFile) {
+                resultDiv.innerHTML = '<div class="error">Please fill in both fields</div>';
+                return;
+            }
+
+            resultDiv.innerHTML = '<p>Adding image...</p>';
+            
+            try {
+                const formData = new FormData();
+                formData.append('pictureType', pictureType);
+                formData.append('picturePath', pictureFile);
+
+                const response = await fetch('http://localhost:12345/gallery', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h4>Success!</h4>
+                        <p>Status: ${response.status}</p>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
+                // Refresh the gallery list
+                setTimeout(() => {
+                    testGetAllGalleryImages();
+                }, 1000);
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h4>Error!</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function testImageDisplay(images) {
+            const resultDiv = document.getElementById('image-display-result');
+            let html = '<h4>Testing Image Display:</h4>';
+            
+            images.forEach((image, index) => {
+                const imageUrl = `http://localhost:12345/images/${image.pictureImage || image.picturePath || 'default.jpg'}`;
+                html += `
+                    <div style="margin: 20px; padding: 10px; border: 1px solid #ddd;">
+                        <h5>Image ${index + 1}: ${image.pictureId}</h5>
+                        <p><strong>Type:</strong> ${image.pictureType}</p>
+                        <p><strong>Name:</strong> ${image.pictureName}</p>
+                        <p><strong>Image Field:</strong> ${image.pictureImage || 'null'}</p>
+                        <p><strong>Path Field:</strong> ${image.picturePath || 'null'}</p>
+                        <p><strong>URL:</strong> ${imageUrl}</p>
+                        <img src="${imageUrl}" alt="${image.pictureName}" class="image-preview" 
+                             onerror="this.style.border='2px solid red'; this.alt='IMAGE FAILED TO LOAD';">
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>

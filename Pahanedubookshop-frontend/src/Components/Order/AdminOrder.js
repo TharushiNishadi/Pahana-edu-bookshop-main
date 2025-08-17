@@ -30,6 +30,7 @@ const AdminOrder = () => {
           },
         });
         console.log('Orders response:', ordersResponse.data);
+        console.log('First order structure:', ordersResponse.data[0]);
 
         const filteredOrders = ordersResponse.data.filter(
           (order) => order.branch.trim()
@@ -47,12 +48,20 @@ const AdminOrder = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = orders.filter(order =>
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.userEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.deliveryAddress.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filtered = orders.filter(order => {
+      // Add null checks and make search more robust
+      const orderId = (order.orderId || '').toString().toLowerCase();
+      const userEmail = (order.userEmail || '').toString().toLowerCase();
+      const deliveryAddress = (order.deliveryAddress || '').toString().toLowerCase();
+      const searchTerm = searchQuery.toLowerCase();
+      
+      return orderId.includes(searchTerm) || 
+             userEmail.includes(searchTerm) || 
+             deliveryAddress.includes(searchTerm);
+    });
     setFilteredOrders(filtered);
+    console.log('Search query:', searchQuery);
+    console.log('Filtered results:', filtered.length);
   }, [searchQuery, orders]);
 
   const handleOrderClick = (order) => {
@@ -117,8 +126,16 @@ const AdminOrder = () => {
             className="form-control search-input"
             placeholder="Search Orders..."
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              console.log('Search input changed:', e.target.value);
+              setSearchQuery(e.target.value);
+            }}
           />
+          {searchQuery && (
+            <div className="search-status">
+              Showing {filteredOrders.length} of {orders.length} orders
+            </div>
+          )}
         </div>
         <p className='sub-par'>Note - Click on the Order ID to view the products included in the order.</p>
 
@@ -153,10 +170,10 @@ const AdminOrder = () => {
                     <td>{order.paymentMethod}</td>
                     <td>{order.deliveryAddress}</td>
                     <td>{order.offerId}</td>
-                    <td>Rs. {order.taxAmount.toFixed(2)}</td>
-                    <td>Rs. {order.deliveryCharges.toFixed(2)}</td>
-                    <td>Rs. {order.discountAmount.toFixed(2)}</td>
-                    <td>Rs. {order.finalAmount.toFixed(2)}</td>
+                    <td>Rs. {(order.taxAmount || 0).toFixed(2)}</td>
+                    <td>Rs. {(order.deliveryCharges || 0).toFixed(2)}</td>
+                    <td>Rs. {(order.discountAmount || 0).toFixed(2)}</td>
+                    <td>Rs. {(order.finalAmount || 0).toFixed(2)}</td>
                     <td>
                       {order.orderStatus === 'Pending' ? (
                         <>

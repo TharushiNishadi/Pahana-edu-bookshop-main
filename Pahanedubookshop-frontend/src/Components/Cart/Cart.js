@@ -49,11 +49,13 @@ const Cart = () => {
   };
 
   const handleRemoveClick = (productId, quantity) => {
+    console.log('Remove button clicked for:', { productId, quantity });
     setProductToRemove({ productId, quantity });
     setShowModal(true);
   };
 
   const handleConfirmRemove = async () => {
+    console.log('Confirming removal of:', productToRemove);
     if (productToRemove) {
       await handleClearFromCart(productToRemove.productId, productToRemove.quantity);
       setShowModal(false);
@@ -69,6 +71,7 @@ const Cart = () => {
 
     try {
       const userId = jwtDecode(token).userId;
+      console.log('Removing from cart:', { userId, productId, quantity });
 
       const response = await fetch(`/api/cart/remove?userId=${userId}&productId=${productId}&quantity=${quantity}`, {
         method: 'DELETE',
@@ -78,25 +81,39 @@ const Cart = () => {
         },
       });
 
+      console.log('Response status:', response.status);
+      console.log('Response ok:', response.ok);
+
       if (response.ok) {
-        console.log('Product removed from cart');
+        console.log('Product removed from cart successfully');
         
+        // Update local state immediately
         setCartItems((prevItems) => prevItems.filter(item => item.productId !== productId));
 
+        // Update total amount
         setTotalAmount((prevTotal) => {
           const removedItem = cartItems.find(item => item.productId === productId);
           if (removedItem) {
-            return (prevTotal || 0) - ((removedItem.productPrice || 0) * (removedItem.quantity || 0));
+            const newTotal = (prevTotal || 0) - ((removedItem.productPrice || 0) * (removedItem.quantity || 0));
+            console.log('Updated total amount:', newTotal);
+            return newTotal;
           }
           return prevTotal || 0;
         });
 
-        fetchCartItems();
+        // Refresh cart data
+        await fetchCartItems();
+        
+        // Show success message
+        alert('Product removed from cart successfully!');
       } else {
-        console.error('Failed to remove product from cart');
+        const errorText = await response.text();
+        console.error('Failed to remove product from cart. Status:', response.status, 'Response:', errorText);
+        alert('Failed to remove product from cart. Please try again.');
       }
     } catch (error) {
-      console.error('Error:', error);
+      console.error('Error removing from cart:', error);
+      alert('Error removing product from cart: ' + error.message);
     }
   };
 
@@ -151,7 +168,10 @@ const Cart = () => {
                       </p>
                       <button
                         className="card-clear-btn"
-                        onClick={() => handleRemoveClick(item.productId, item.quantity)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent triggering the parent click
+                          handleRemoveClick(item.productId, item.quantity);
+                        }}
                       >
                         <span>
                           <i className="bi bi-trash-fill"></i>

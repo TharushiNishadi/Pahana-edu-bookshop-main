@@ -288,6 +288,32 @@
     margin-bottom: 120px;
   }
 
+  .btn-primary-submit {
+    background-color: #A69003;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 200px;
+  }
+
+  .btn-primary-submit:hover {
+    background-color: #8a7a02;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(166, 144, 3, 0.3);
+  }
+
+  .btn-primary-submit:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
 
 
 

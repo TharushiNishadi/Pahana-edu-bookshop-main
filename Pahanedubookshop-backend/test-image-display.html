@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Image Display - Pahana Bookshop</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .image-display {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .image-display img {
+            max-width: 300px;
+            max-height: 200px;
+            border: 1px solid #999;
+            border-radius: 3px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .info {
+            color: #17a2b8;
+            font-weight: bold;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .status.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>🖼️ Test Image Display - Pahana Bookshop Backend</h1>
+    
+    <div class="container">
+        <h2>📋 Test Instructions</h2>
+        <p>This page will help you test if the image display functionality is working correctly.</p>
+        <p><strong>Backend URL:</strong> <span id="backendUrl">http://localhost:12345</span></p>
+        <p><strong>Note:</strong> Make sure your backend server is running on port 12345</p>
+    </div>
+
+    <div class="container">
+        <h2>🔧 Backend Status Check</h2>
+        <button onclick="checkBackendStatus()">Check Backend Status</button>
+        <button onclick="checkImagesStatus()">Check Images Directory Status</button>
+        <button onclick="createTestImage()">Create Test Image</button>
+        <div id="backendStatus" class="status"></div>
+    </div>
+
+    <div class="container">
+        <h2>🖼️ Test Image Display</h2>
+        <p>These images should display as SVG placeholders if the backend is working correctly:</p>
+        
+        <div class="test-section">
+            <h3>Category Images</h3>
+            <div class="image-display">
+                <strong>fiction.jpg:</strong><br>
+                <img src="http://localhost:12345/images/fiction.jpg" alt="Fiction Category" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+            <div class="image-display">
+                <strong>non-fiction.jpg:</strong><br>
+                <img src="http://localhost:12345/images/non-fiction.jpg" alt="Non-Fiction Category" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Product Images</h3>
+            <div class="image-display">
+                <strong>book1.jpg:</strong><br>
+                <img src="http://localhost:12345/images/book1.jpg" alt="Book 1" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+            <div class="image-display">
+                <strong>book2.jpg:</strong><br>
+                <img src="http://localhost:12345/images/book2.jpg" alt="Book 2" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>Gallery Images</h3>
+            <div class="image-display">
+                <strong>fiction-gallery.jpg:</strong><br>
+                <img src="http://localhost:12345/images/fiction-gallery.jpg" alt="Fiction Gallery" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+            <div class="image-display">
+                <strong>academic-gallery.jpg:</strong><br>
+                <img src="http://localhost:12345/images/academic-gallery.jpg" alt="Academic Gallery" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span style="display:none; color: red;">❌ Image failed to load</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        const backendUrl = 'http://localhost:12345';
+        
+        function showStatus(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `status ${type}`;
+        }
+
+        async function checkBackendStatus() {
+            try {
+                showStatus('backendStatus', 'Checking backend status...', 'info');
+                
+                const response = await fetch(backendUrl + '/');
+                if (response.ok) {
+                    const text = await response.text();
+                    showStatus('backendStatus', '✅ Backend is running! Server responded successfully.', 'success');
+                    console.log('Backend response:', text);
+                } else {
+                    showStatus('backendStatus', '❌ Backend responded with error: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showStatus('backendStatus', '❌ Cannot connect to backend: ' + error.message, 'error');
+                console.error('Backend connection error:', error);
+            }
+        }
+
+        async function checkImagesStatus() {
+            try {
+                showStatus('backendStatus', 'Checking images directory status...', 'info');
+                
+                const response = await fetch(backendUrl + '/test-images-status');
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('backendStatus', '✅ Images directory status checked successfully!', 'success');
+                    console.log('Images status:', data);
+                    
+                    // Display results
+                    const resultsDiv = document.getElementById('testResults');
+                    resultsDiv.innerHTML = '<h3>Images Directory Status:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                } else {
+                    showStatus('backendStatus', '❌ Failed to check images status: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showStatus('backendStatus', '❌ Error checking images status: ' + error.message, 'error');
+                console.error('Images status error:', error);
+            }
+        }
+
+        async function createTestImage() {
+            try {
+                showStatus('backendStatus', 'Creating test image...', 'info');
+                
+                const response = await fetch(backendUrl + '/test-create-image');
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus('backendStatus', '✅ Test image created successfully!', 'success');
+                    console.log('Test image created:', data);
+                    
+                    // Display results
+                    const resultsDiv = document.getElementById('testResults');
+                    resultsDiv.innerHTML = '<h3>Test Image Created:</h3><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    
+                    // Test the created image
+                    setTimeout(() => {
+                        const testImg = new Image();
+                        testImg.onload = function() {
+                            showStatus('backendStatus', '✅ Test image is loading correctly!', 'success');
+                        };
+                        testImg.onerror = function() {
+                            showStatus('backendStatus', '❌ Test image failed to load', 'error');
+                        };
+                        testImg.src = backendUrl + '/images/test-image.jpg';
+                    }, 1000);
+                } else {
+                    showStatus('backendStatus', '❌ Failed to create test image: ' + response.status, 'error');
+                }
+            } catch (error) {
+                showStatus('backendStatus', '❌ Error creating test image: ' + error.message, 'error');
+                console.error('Test image creation error:', error);
+            }
+        }
+
+        // Auto-check backend status when page loads
+        window.onload = function() {
+            setTimeout(checkBackendStatus, 1000);
+        };
+    </script>
+</body>
+</html>

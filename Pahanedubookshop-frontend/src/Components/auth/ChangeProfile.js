@@ -19,7 +19,7 @@ const ChangeProfile = () => {
   const [userType, setUserType] = useState('');
   const navigate = useNavigate();
 
-  const baseImageUrl = 'http://localhost:8080/images/';
+  const baseImageUrl = 'http://localhost:12345/images/';
 
 
   const fetchUserData = async () => {
