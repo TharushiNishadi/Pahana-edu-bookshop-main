@@ -12,6 +12,9 @@ const ForgetPw2 = () => {
     const [timeLeft, setTimeLeft] = useState(180); // 3 minutes = 180 seconds
     const navigate = useNavigate();
 
+    // Get the API base URL from environment or use default
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
     useEffect(() => {
         const email = localStorage.getItem('resetEmail');
 
@@ -19,6 +22,9 @@ const ForgetPw2 = () => {
             navigate('/forget-password-1');
             return;
         }
+
+        // Reset timer to 3 minutes when component mounts
+        setTimeLeft(180);
 
         const timerInterval = setInterval(() => {
             setTimeLeft((prevTime) => {
@@ -56,12 +62,12 @@ const ForgetPw2 = () => {
         try {
             const email = localStorage.getItem('resetEmail');
 
-            const response = await axios.post('/api/password/verify', new URLSearchParams({
+            const response = await axios.post(`${API_BASE_URL}/api/password/verify`, {
                 email: email,
-                code: code,
-            }), {
+                code: code
+            }, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
             });
 
@@ -146,11 +152,29 @@ const ForgetPw2 = () => {
                         </div>
 
                         <div className="d-flex justify-content-between align-items-center mb-3">
-                            <button type="submit" className="btn btn-primary-submit" disabled={loading}>VERIFY CODE</button>
+                            <button 
+                                type="submit" 
+                                className="btn btn-primary-submit" 
+                                disabled={loading || timeLeft === 0}
+                            >
+                                VERIFY CODE
+                            </button>
                         </div>
 
                         <div className="countdown-container">
                             <p className="countdown">Time remaining: {formatTime(timeLeft)}</p>
+                            {timeLeft === 0 && (
+                                <div>
+                                    <p className="text-danger">Verification code has expired. Please request a new one.</p>
+                                    <button 
+                                        type="button" 
+                                        className="btn btn-secondary" 
+                                        onClick={() => navigate('/forget-password-1')}
+                                    >
+                                        Request New Code
+                                    </button>
+                                </div>
+                            )}
                         </div>
 
                         {errors.apiError && <div className="alert alert-danger">{errors.apiError}</div>}

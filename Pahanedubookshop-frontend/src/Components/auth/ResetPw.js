@@ -16,6 +16,9 @@ const ResetPw = () => {
     const [code, setCode] = useState('');
     const navigate = useNavigate();
 
+    // Get the API base URL from environment or use default
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
     useEffect(() => {
         const storedEmail = localStorage.getItem('resetEmail');
         const storedCode = localStorage.getItem('resetCode');
@@ -83,13 +86,13 @@ const ResetPw = () => {
         }
 
         try {
-            const response = await axios.post('/api/password/reset', new URLSearchParams({
+            const response = await axios.post(`${API_BASE_URL}/api/password/reset`, {
                 email,
                 code,
                 newPassword: password
-            }), {
+            }, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
             });
 

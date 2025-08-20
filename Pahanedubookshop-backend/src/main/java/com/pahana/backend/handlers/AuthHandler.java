@@ -151,6 +151,12 @@ public class AuthHandler implements HttpHandler {
                 return;
             }
 
+            // Check if user exists before processing password reset
+            if (!userExists(email)) {
+                sendErrorResponse(exchange, 404, "No account associated with " + email);
+                return;
+            }
+
             // In a real application, you would send a password reset email
             // For now, we'll just return a success message
             Map<String, Object> response = new HashMap<>();
@@ -177,6 +183,12 @@ public class AuthHandler implements HttpHandler {
 
             if (email == null || code == null) {
                 sendErrorResponse(exchange, 400, "Email and verification code are required");
+                return;
+            }
+
+            // Check if user exists before processing verification
+            if (!userExists(email)) {
+                sendErrorResponse(exchange, 404, "No account associated with " + email);
                 return;
             }
 

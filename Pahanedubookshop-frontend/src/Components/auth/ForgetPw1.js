@@ -11,6 +11,9 @@ const ForgetPw1 = () => {
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
 
+    // Get the API base URL from environment or use default
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
     const validateEmail = (email) => {
         const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return re.test(email);
@@ -38,11 +41,11 @@ const ForgetPw1 = () => {
         setLoading(true);
     
         try {
-            const response = await axios.post('/api/password/request', new URLSearchParams({
-                email: email,
-            }), {
+            const response = await axios.post(`${API_BASE_URL}/api/password/request`, {
+                email: email
+            }, {
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                 },
             });
     

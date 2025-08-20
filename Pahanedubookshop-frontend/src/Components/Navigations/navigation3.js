@@ -86,9 +86,6 @@ const TrdNavigation = () => {
                     <div className="collapse navbar-collapse flex-grow-1 justify-content-center" id="navbarNavDropdown">
                         <ul className="navbar-nav">
                             <li className="nav-item">
-                                <Link className={`nav-link ${location.pathname === '/staff-dashboard' ? 'active' : ''}`} to="/staff-dashboard">Resrvation</Link>
-                            </li>
-                            <li className="nav-item">
                                 <Link className={`nav-link ${location.pathname === '/order-staff' ? 'active' : ''}`} to="/order-staff">Orders</Link>
                             </li>
                             <li className="nav-item">

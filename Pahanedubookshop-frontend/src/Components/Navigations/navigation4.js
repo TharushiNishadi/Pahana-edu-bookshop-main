@@ -37,7 +37,7 @@ const FrtNavigation = () => {
             const userData = response.data;
             setUser({
                 username: userData.username || 'User',
-                userEmail: userData.userEmail || 'user@example.com',
+                userEmail: userData.userEmail || 'admin@pahana.com',
                 profilePicture: userData.profilePicture ? userData.profilePicture : defaultProfilePic
             });
         } catch (error) {
@@ -45,7 +45,7 @@ const FrtNavigation = () => {
             // Set default values if fetch fails
             setUser({
                 username: 'User',
-                userEmail: 'user@example.com',
+                userEmail: 'admin@pahana.com',
                 profilePicture: defaultProfilePic
             });
         }
