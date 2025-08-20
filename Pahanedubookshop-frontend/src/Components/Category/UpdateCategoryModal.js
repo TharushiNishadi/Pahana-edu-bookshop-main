@@ -86,7 +86,7 @@ const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
 
       // Show success notification
       Swal.fire({
-        title: 'Success! ✏️',
+        title: 'Success! ',
         text: `Category "${categoryName}" updated successfully!`,
         icon: 'success',
         timer: 3000,
@@ -145,25 +145,7 @@ const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
     handleClose();
   };
 
-  const handleDebugClick = () => {
-    console.log('=== DEBUG CATEGORY UPDATE ===');
-    console.log('Category ID:', category?.categoryId);
-    console.log('Current form data:');
-    console.log('- categoryName:', categoryName);
-    console.log('- categoryDescription:', categoryDescription);
-    console.log('- categoryImage:', categoryImage);
-    
-    // Test the backend endpoint
-    axios.get(`${API_BASE_URL}/test-category-db`)
-      .then(response => {
-        console.log('Database test result:', response.data);
-        alert('Check console for debug info and database test results');
-      })
-      .catch(error => {
-        console.error('Database test failed:', error);
-        alert('Database test failed! Check console for details.');
-      });
-  };
+
 
   if (!show) return null;
 
