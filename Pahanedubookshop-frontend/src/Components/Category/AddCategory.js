@@ -10,23 +10,27 @@ const AddCategory = () => {
     const [formData, setFormData] = useState({
         categoryName: '',
         categoryDescription: '',
-        categoryImage: null,
+        // categoryImage: null, // Temporarily removed until multipart parsing is fixed
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
-    const [imagePreview, setImagePreview] = useState('');
+    // const [imagePreview, setImagePreview] = useState(''); // Temporarily removed
     const navigate = useNavigate();
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setFormData(prevData => ({ ...prevData, categoryImage: file }));
-            const objectUrl = URL.createObjectURL(file);
-            setImagePreview(objectUrl);
+    // Get the API base URL from environment or use default
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
-            return () => URL.revokeObjectURL(objectUrl);
-        }
-    };
+    // Temporarily disabled until multipart parsing is fixed
+    // const handleFileChange = (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setFormData(prevData => ({ ...prevData, categoryImage: file }));
+    //         const objectUrl = URL.createObjectURL(file);
+    //         setImagePreview(objectUrl);
+
+    //         return () => URL.revokeObjectURL(objectUrl);
+    //     }
+    // };
 
     const validateForm = () => {
         const newErrors = {};
@@ -35,9 +39,10 @@ const AddCategory = () => {
             newErrors.categoryName = 'Category Name is required';
         }
 
-        if (!formData.categoryImage) {
-            newErrors.categoryImage = 'Category Image is required';
-        }
+        // Temporarily disabled image validation until multipart parsing is fixed
+        // if (!formData.categoryImage) {
+        //     newErrors.categoryImage = 'Category Image is required';
+        // }
 
         if (!formData.categoryDescription) {
             newErrors.categoryDescription = 'Category Description is required';
@@ -58,14 +63,19 @@ const AddCategory = () => {
         if (validateForm()) {
             setLoading(true);
 
-            const data = new FormData();
-            data.append('categoryName', formData.categoryName);
-            data.append('categoryImage', formData.categoryImage);
-            data.append('categoryDescription', formData.categoryDescription);
+            // Send JSON data instead of multipart form data (temporary fix)
+            const jsonData = {
+                categoryName: formData.categoryName,
+                categoryDescription: formData.categoryDescription
+                // categoryImage: formData.categoryImage // Temporarily disabled
+            };
 
-            axios.post('/category', data, {
+            console.log('Sending category creation request to:', `${API_BASE_URL}/category`);
+            console.log('JSON data being sent:', jsonData);
+
+            axios.post(`${API_BASE_URL}/category`, jsonData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data'
+                    'Content-Type': 'application/json'
                 }
             })
             .then(response => {
@@ -81,19 +91,42 @@ const AddCategory = () => {
                 setFormData({
                     categoryName: '',
                     categoryDescription: '',
-                    categoryImage: null,
+                    // categoryImage: null, // Temporarily removed
                 });
-                setImagePreview('');
+                // setImagePreview(''); // Temporarily removed
             })
             .catch(error => {
                 console.error('Error adding category:', error);
-                const errorMsg = error.response?.data?.message || 'Failed to add category';
+                console.error('Error response:', error.response);
+                console.error('Error request:', error.request);
+                
+                let errorMsg = 'Failed to add category';
+                if (error.response) {
+                    // Backend responded with error
+                    const backendError = error.response.data;
+                    if (backendError.error) {
+                        errorMsg = backendError.error;
+                    } else if (backendError.message) {
+                        errorMsg = backendError.message;
+                    } else {
+                        errorMsg = `Status: ${error.response.status}`;
+                    }
+                    console.error('Backend error details:', backendError);
+                } else if (error.request) {
+                    // Request was made but no response received
+                    errorMsg = 'No response from server. Please check if backend is running.';
+                    console.error('No response received:', error.request);
+                } else {
+                    // Something else happened
+                    errorMsg = error.message || 'Unknown error occurred.';
+                    console.error('Request setup error:', error.message);
+                }
+                
                 Swal.fire({
-                    title: 'Error!',
+                    title: 'Error! ❌',
                     text: errorMsg,
                     icon: 'error',
-                    timer: 2500,
-                    showConfirmButton: false
+                    confirmButtonText: 'OK'
                 });
             })
             .finally(() => {
@@ -121,7 +154,7 @@ const AddCategory = () => {
                         <p className="mt-3" style={{ color: 'white', fontSize: 20 }}>Adding category. Please wait...</p>
                     </div>
                 ) : (
-                    <form onSubmit={handleSubmit} encType="multipart/form-data">
+                    <form onSubmit={handleSubmit}>
                         <div className="mb-3 row">
                             <label htmlFor="categoryName" className="col-sm-2 col-form-label">Category Name *</label>
                             <div className="col-sm-10">
@@ -136,31 +169,6 @@ const AddCategory = () => {
                                     required
                                 />
                                 {errors.categoryName && <div className="invalid-feedback">{errors.categoryName}</div>}
-                            </div>
-                        </div>
-
-                        <div className="mb-3 row">
-                            <label htmlFor="categoryImage" className="col-sm-2 col-form-label">Category Image *</label>
-                            <div className="col-sm-10">
-                                <div className="image-preview-container">
-                                    <input
-                                        type="file"
-                                        id="categoryImage"
-                                        name="categoryImage"
-                                        onChange={handleFileChange}
-                                        accept="image/*"
-                                        style={{ display: 'none' }}
-                                    />
-                                    <label htmlFor="categoryImage" className={`custom-file-upload ${errors.categoryImage ? 'is-invalid' : ''}`}>
-                                        Choose Image
-                                    </label>
-                                    {imagePreview && (
-                                        <div className="image-preview">
-                                            <img src={imagePreview} alt="Category Preview" />
-                                        </div>
-                                    )}
-                                    {errors.categoryImage && <div className="invalid-feedback">{errors.categoryImage}</div>}
-                                </div>
                             </div>
                         </div>
 

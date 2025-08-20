@@ -317,6 +317,7 @@ const AddUser = () => {
                     <option value="" disabled>Select User type</option>
                     <option value="Admin">Admin</option>
                     <option value="Staff">Staff</option>
+                    <option value="Staff">Customer</option>
                   </select>
                   {errors.userType && <div className="invalid-feedback">{errors.userType}</div>}
                 </div>

@@ -6,8 +6,6 @@ import Swal from 'sweetalert2';
 const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
   const [categoryName, setCategoryName] = useState(category?.categoryName || '');
   const [categoryDescription, setCategoryDescription] = useState(category?.categoryDescription || '');
-  const [categoryImage, setCategoryImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
@@ -18,26 +16,8 @@ const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
     if (category) {
       setCategoryName(category.categoryName || '');
       setCategoryDescription(category.categoryDescription || '');
-      setCategoryImage(null);
-      setImagePreview(category.categoryImage ? `${API_BASE_URL}/images/${category.categoryImage}` : '');
     }
-  }, [category, API_BASE_URL]);
-
-  const handleFileChange = (e) => {
-    console.log('File change event triggered:', e.target.files[0]);
-    const file = e.target.files[0];
-    setCategoryImage(file);
-
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setImagePreview('');
-    }
-  };
+  }, [category]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -63,24 +43,18 @@ const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
     setLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('categoryName', categoryName);
-      formData.append('categoryDescription', categoryDescription);
-
-      if (categoryImage instanceof File) {
-        formData.append('categoryImage', categoryImage);
-      }
+      // Send JSON data for category update
+      const jsonData = {
+        categoryName: categoryName,
+        categoryDescription: categoryDescription
+      };
 
       console.log('Sending update request to:', `${API_BASE_URL}/category/${category.categoryId}`);
-      console.log('Form data:', {
-        categoryName,
-        categoryDescription,
-        categoryImage: categoryImage ? 'File selected' : 'No file'
-      });
+      console.log('JSON data:', jsonData);
 
-      await axios.put(`${API_BASE_URL}/category/${category.categoryId}`, formData, {
+      await axios.put(`${API_BASE_URL}/category/${category.categoryId}`, jsonData, {
         headers: {
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
 
@@ -195,36 +169,7 @@ const UpdateCategoryModal = ({ show, handleClose, category, onUpdate }) => {
                   />
                 </Form.Group>
                 <br />
-                <Form.Group controlId="formCategoryImage" className="mb-3">
-                  <Form.Label>Category Image</Form.Label><br />
-                  <div className="image-preview-container">
-                    <input 
-                      type="file" 
-                      id="categoryImage" 
-                      name="categoryImage" 
-                      onChange={handleFileChange} 
-                      accept="image/*" 
-                      style={{ display: 'none' }} 
-                    />
-                    <label 
-                      htmlFor="categoryImage" 
-                      className={`custom-file-upload ${errors.categoryImage ? 'is-invalid' : ''}`}
-                      style={{ cursor: 'pointer', userSelect: 'none' }}
-                      onClick={() => {
-                        console.log('Change Image label clicked');
-                        document.getElementById('categoryImage').click();
-                      }}
-                    >
-                      Change Image
-                    </label>
-                    {imagePreview && (
-                      <div className="image-preview mt-3">
-                        <img src={imagePreview} alt="Category Preview" style={{ maxWidth: '200px', maxHeight: '200px' }} />
-                      </div>
-                    )}
-                    {errors.categoryImage && <div className="invalid-feedback">{errors.categoryImage}</div>}
-                  </div>
-                </Form.Group>
+                {/* Image upload section removed - will be re-added when multipart parsing is fixed */}
               </Form>
             </div>
             <div className="modal-footer" style={{ position: 'sticky', bottom: 0, backgroundColor: 'white', borderTop: '1px solid #dee2e6', padding: '15px' }}>

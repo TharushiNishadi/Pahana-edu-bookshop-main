@@ -1,6 +1,7 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Swal from 'sweetalert2';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
 import FrtNavigation from "../Navigations/navigation4";
@@ -58,10 +59,29 @@ const ViewCategory = () => {
         .then(() => {
           setCategories(prevCategories => prevCategories.filter(category => category.categoryId !== categoryToDelete.categoryId));
           setShowDeleteModal(false);
+          setCategoryToDelete(null); // Clear the category to delete
+          
+          // Show success notification
+          Swal.fire({
+            icon: 'success',
+            title: 'Category Deleted',
+            text: `Category "${categoryToDelete.categoryName}" has been deleted.`,
+            confirmButtonColor: '#3085d6',
+            confirmButtonText: 'OK'
+          });
         })
         .catch((error) => {
           console.error('Error deleting category:', error);
           setError('Failed to delete category');
+          
+          // Show error notification
+          Swal.fire({
+            icon: 'error',
+            title: 'Delete Failed',
+            text: 'Failed to delete category. Please try again.',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'OK'
+          });
         });
     }
   };

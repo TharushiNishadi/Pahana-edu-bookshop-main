@@ -239,13 +239,18 @@ public class CategoryHandler implements HttpHandler {
 
     private String extractBoundary(String contentType) {
         if (contentType == null) return null;
+        LOGGER.info("Extracting boundary from Content-Type: " + contentType);
         String[] parts = contentType.split(";");
         for (String part : parts) {
             part = part.trim();
+            LOGGER.info("Checking part: " + part);
             if (part.startsWith("boundary=")) {
-                return part.substring("boundary=".length());
+                String boundary = part.substring("boundary=".length());
+                LOGGER.info("Extracted boundary: " + boundary);
+                return boundary;
             }
         }
+        LOGGER.warning("No boundary found in Content-Type: " + contentType);
         return null;
     }
 
@@ -255,6 +260,8 @@ public class CategoryHandler implements HttpHandler {
         String endBoundary = "--" + boundary + "--";
         
         LOGGER.info("Parsing multipart data with boundary: " + boundary);
+        LOGGER.info("Boundary line: " + boundaryLine);
+        LOGGER.info("End boundary: " + endBoundary);
         
         // Read the entire input stream into a byte array for proper parsing
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -272,8 +279,14 @@ public class CategoryHandler implements HttpHandler {
         LOGGER.info("Content length: " + content.length());
         LOGGER.info("Content preview: " + content.substring(0, Math.min(200, content.length())));
         
+        // Split by boundary and process each part
         String[] parts = content.split(boundaryLine);
         LOGGER.info("Split into " + parts.length + " parts");
+        
+        // Debug: Print all parts for troubleshooting
+        for (int i = 0; i < parts.length; i++) {
+            LOGGER.info("Part " + i + " (length: " + parts[i].length() + "): " + parts[i].substring(0, Math.min(100, parts[i].length())));
+        }
         
         for (int partIndex = 0; partIndex < parts.length; partIndex++) {
             String part = parts[partIndex];
@@ -393,43 +406,40 @@ public class CategoryHandler implements HttpHandler {
             
             Map<String, Object> categoryData = new HashMap<>();
             
-            if (contentType != null && contentType.startsWith("multipart/form-data")) {
-                // Handle multipart form data
-                LOGGER.info("Processing multipart form data");
-                String boundary = extractBoundary(contentType);
-                if (boundary != null) {
-                    Map<String, String> multipartData = parseMultipartData(exchange.getRequestBody(), boundary);
-                    // Convert Map<String, String> to Map<String, Object>
-                    categoryData = new HashMap<>();
-                    for (Map.Entry<String, String> entry : multipartData.entrySet()) {
-                        categoryData.put(entry.getKey(), entry.getValue());
-                    }
-                } else {
-                    LOGGER.warning("No boundary found in multipart content type");
-                    sendErrorResponse(exchange, 400, "Invalid multipart form data");
-                    return;
-                }
-            } else {
-                // Handle JSON data
-                LOGGER.info("Processing JSON data");
-                String requestBody = getRequestBody(exchange);
-                LOGGER.info("Request body: " + requestBody);
-                
-                if (requestBody == null || requestBody.trim().isEmpty()) {
-                    LOGGER.warning("Empty request body received");
-                    sendErrorResponse(exchange, 400, "Request body is empty");
-                    return;
-                }
-                
+            // Temporarily disable multipart parsing to fix the issue
+            // TODO: Fix multipart parsing and re-enable this
+            LOGGER.info("Processing request data (temporarily using JSON parsing)");
+            String requestBody = getRequestBody(exchange);
+            LOGGER.info("Request body: " + requestBody);
+            
+            if (requestBody == null || requestBody.trim().isEmpty()) {
+                LOGGER.warning("Empty request body received");
+                sendErrorResponse(exchange, 400, "Request body is empty");
+                return;
+            }
+            
+            try {
                 categoryData = JsonUtil.fromJson(requestBody, Map.class);
+                LOGGER.info("Parsed JSON data: " + categoryData);
+            } catch (Exception e) {
+                LOGGER.severe("Failed to parse JSON data: " + e.getMessage());
+                sendErrorResponse(exchange, 400, "Failed to parse request data. Please check the format.");
+                return;
             }
             
             LOGGER.info("Parsed category data: " + categoryData);
             
             if (categoryData == null || categoryData.isEmpty()) {
                 LOGGER.warning("No valid category data received");
-                sendErrorResponse(exchange, 400, "No valid category data provided");
+                LOGGER.warning("Category data map is null or empty");
+                sendErrorResponse(exchange, 400, "No valid category data provided. Please check that all required fields are filled.");
                 return;
+            }
+            
+            // Log the specific data received for debugging
+            LOGGER.info("Category data keys received: " + categoryData.keySet());
+            for (Map.Entry<String, Object> entry : categoryData.entrySet()) {
+                LOGGER.info("Field: " + entry.getKey() + " = " + entry.getValue());
             }
 
             // Check if category exists first
