@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Favorites Database</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button { background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 10px; }
+        button:hover { background: #0056b3; }
+        .success-btn { background: #28a745; }
+        .danger-btn { background: #dc3545; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        input { padding: 10px; margin: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Test Favorites Database</h1>
+        <p>Let's check if the favorites table exists and has data.</p>
+        
+        <h3>Step 1: Check Database Connection</h3>
+        <button onclick="checkDatabase()">🔌 Check Database</button>
+        
+        <h3>Step 2: Check Favorites Table</h3>
+        <button onclick="checkFavoritesTable()">📋 Check Favorites Table</button>
+        
+        <h3>Step 3: Create Test Data</h3>
+        <input type="text" id="testUserId" placeholder="User ID" value="admin">
+        <input type="text" id="testProductId" placeholder="Product ID" value="prod_001">
+        <button onclick="createTestData()" class="success-btn">➕ Create Test Data</button>
+        
+        <h3>Step 4: Check All Favorites</h3>
+        <button onclick="checkAllFavorites()">👥 Check All Favorites</button>
+        
+        <h3>Step 5: Test User Favorites</h3>
+        <input type="text" id="checkUserId" placeholder="User ID to check" value="admin">
+        <button onclick="checkUserFavorites()">👤 Check User Favorites</button>
+        
+        <div id="result" class="result info">Click a button to start testing...</div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        function showResult(message, type = 'info') {
+            document.getElementById('result').textContent = message;
+            document.getElementById('result').className = `result ${type}`;
+        }
+        
+        async function checkDatabase() {
+            try {
+                showResult('🔄 Checking database connection...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-favorites`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Database check complete!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Database check failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkFavoritesTable() {
+            try {
+                showResult('🔄 Checking favorites table...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/api/favorites`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Favorites table check complete!\n\nTotal favorites: ${data.length}\n\nData: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Favorites table check failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function createTestData() {
+            try {
+                const userId = document.getElementById('testUserId').value;
+                const productId = document.getElementById('testProductId').value;
+                showResult(`🔄 Creating test favorite: User ${userId}, Product ${productId}`, 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/api/favorites/add?userId=${userId}&productId=${productId}`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult(`✅ Test favorite created!\n\nResponse: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Failed to create test favorite: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkAllFavorites() {
+            try {
+                showResult('🔄 Checking all favorites...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/api/favorites`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ All favorites retrieved!\n\nCount: ${data.length}\n\nFavorites: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Failed to get all favorites: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkUserFavorites() {
+            try {
+                const userId = document.getElementById('checkUserId').value;
+                showResult(`🔄 Checking favorites for user: ${userId}`, 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/api/favorites/list?userId=${userId}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ User favorites retrieved!\n\nUser: ${userId}\nCount: ${data.length}\n\nFavorites: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Failed to get user favorites: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

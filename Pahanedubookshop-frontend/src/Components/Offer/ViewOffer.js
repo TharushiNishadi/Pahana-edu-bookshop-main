@@ -18,13 +18,17 @@ const ViewOffer = () => {
   const [selectedOffer, setSelectedOffer] = useState(null);
   const navigate = useNavigate();
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
-    axios.get('/offer')
+    axios.get(`${API_BASE_URL}/offer`)
       .then(response => {
         setOffers(response.data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching offers:', error);
         setError('Failed to fetch offers');
         setLoading(false);
       });
@@ -47,12 +51,13 @@ const ViewOffer = () => {
   const confirmDeleteOffer = () => {
     if (!offerToDelete) return;
 
-    axios.delete(`/offer/${offerToDelete}`)
+    axios.delete(`${API_BASE_URL}/offer/${offerToDelete}`)
       .then(() => {
         setOffers(prevOffers => prevOffers.filter(offer => offer.offerId !== offerToDelete));
         setShowDeleteModal(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error deleting offer:', error);
         setError('Failed to delete offer');
       });
   };
@@ -73,12 +78,13 @@ const ViewOffer = () => {
 
   const handleUpdateOffer = () => {
     axios
-      .get('/offer')
+      .get(`${API_BASE_URL}/offer`)
       .then((response) => {
         setOffers(response.data);
         setShowModal(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error refreshing offers:', error);
         setError('Failed to fetch updated offers');
       });
   };

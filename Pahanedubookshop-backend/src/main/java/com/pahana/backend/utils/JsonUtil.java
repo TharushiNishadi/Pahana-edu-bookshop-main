@@ -10,7 +10,7 @@ public class JsonUtil {
 
     public static String toJson(Object obj) {
         if (obj == null) {
-            return "null";
+           return "null";
         }
 
         if (obj instanceof String) {
@@ -19,7 +19,7 @@ public class JsonUtil {
 
         if (obj instanceof Number || obj instanceof Boolean) {
             return obj.toString();
-        }
+       }
 
         if (obj instanceof Map) {
             return mapToJson((Map<?, ?>) obj);
@@ -41,7 +41,7 @@ public class JsonUtil {
             if (json == null || json.trim().isEmpty()) {
                 return null;
             }
-            
+
 
             json = json.trim();
 
@@ -177,7 +177,7 @@ public class JsonUtil {
         if (!json.startsWith("{") || !json.endsWith("}")) {
             throw new RuntimeException("Invalid JSON object format");
         }
-        
+
         json = json.substring(1, json.length() - 1).trim();
         if (json.isEmpty()) {
             return map;
@@ -194,7 +194,7 @@ public class JsonUtil {
 
         for (int i = 0; i < json.length(); i++) {
             char c = json.charAt(i);
-            
+
             if (escaped) {
                 if (readingKey) {
                     currentKey.append(c);
@@ -269,7 +269,7 @@ public class JsonUtil {
         if (!json.startsWith("[") || !json.endsWith("]")) {
             throw new RuntimeException("Invalid JSON array format");
         }
-        
+
         json = json.substring(1, json.length() - 1).trim();
         if (json.isEmpty()) {
             return list;
@@ -283,7 +283,7 @@ public class JsonUtil {
 
         for (int i = 0; i < json.length(); i++) {
             char c = json.charAt(i);
-            
+
             if (escaped) {
                 currentValue.append(c);
                 escaped = false;
@@ -315,7 +315,7 @@ public class JsonUtil {
                 currentValue = new StringBuilder();
                 continue;
             }
-            
+
             currentValue.append(c);
         }
 
@@ -329,31 +329,31 @@ public class JsonUtil {
 
     private static Object parseValue(String valueStr) {
         valueStr = valueStr.trim();
-        
+
         if (valueStr.equals("null")) {
             return null;
         }
-        
+
         if (valueStr.equals("true")) {
             return true;
         }
-        
+
         if (valueStr.equals("false")) {
             return false;
         }
-        
+
         if (valueStr.startsWith("\"") && valueStr.endsWith("\"")) {
             return unescapeString(valueStr.substring(1, valueStr.length() - 1));
         }
-        
+
         if (valueStr.startsWith("{") && valueStr.endsWith("}")) {
             return parseMap(valueStr);
         }
-        
+
         if (valueStr.startsWith("[") && valueStr.endsWith("]")) {
             return parseList(valueStr);
         }
-        
+
         try {
             if (valueStr.contains(".")) {
                 return Double.parseDouble(valueStr);
@@ -384,4 +384,4 @@ public class JsonUtil {
             throw new RuntimeException("Failed to create object from JSON", e);
         }
     }
-} 
+}

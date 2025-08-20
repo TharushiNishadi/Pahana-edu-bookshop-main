@@ -7,7 +7,6 @@ A simple Java backend server for the Pahana Edu Bookshop React frontend applicat
 - **Authentication**: User login, registration, and password reset functionality
 - **Product Management**: CRUD operations for products and categories
 - **Order Management**: Handle customer orders and order status updates
-- **Reservation System**: Table reservations for the bookshop
 - **Feedback System**: Customer feedback collection and management
 - **Gallery Management**: Image gallery for the bookshop
 - **Favorites & Cart**: User favorites and shopping cart functionality

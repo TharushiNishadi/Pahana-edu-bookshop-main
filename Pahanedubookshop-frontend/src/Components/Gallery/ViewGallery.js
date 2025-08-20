@@ -1,33 +1,38 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../../CSS/Profile.css';
 import SecFooter from '../footer2';
-import FrtNavigation from '../Navigations/navigation4';
-import SideNavigation from '../Navigations/navigation5';
-import UpdateGalleryModal from './UpdateGalleryModal'; // Import the UpdateGalleryModal component
+import FrtNavigation from "../Navigations/navigation4";
+import SideNavigation from "../Navigations/navigation5";
+import UpdateGalleryModal from './UpdateGalleryModal';
 
 const ViewGallery = () => {
   const [galleries, setGalleries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGallery, setSelectedGallery] = useState(null); // State to store selected gallery for editing
-  const [showUpdateModal, setShowUpdateModal] = useState(false); // State to show/hide the update modal
-  const [showDeleteModal, setShowDeleteModal] = useState(false); // State to show/hide the delete confirmation modal
+  const [selectedGallery, setSelectedGallery] = useState(null);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [galleryToDelete, setGalleryToDelete] = useState(null); // State to store the gallery to be deleted
   const [deleteLoading, setDeleteLoading] = useState(false); // State for delete loading
   const navigate = useNavigate();
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
     const fetchGalleries = async () => {
       try {
-        const response = await axios.get('/gallery');
+        const response = await axios.get(`${API_BASE_URL}/gallery`);
         setGalleries(response.data);
         setLoading(false);
       } catch (error) {
+        console.error('Error fetching galleries:', error);
         setError('Failed to fetch galleries. Please try again later.');
         setLoading(false);
       }
@@ -77,7 +82,7 @@ const ViewGallery = () => {
     });
 
     try {
-      await axios.delete(`/gallery/${galleryToDelete.pictureId}`);
+      await axios.delete(`${API_BASE_URL}/gallery/${galleryToDelete.pictureId}`);
       setGalleries(galleries.filter(g => g.pictureId !== galleryToDelete.pictureId));
       setShowDeleteModal(false); // Close the delete modal after deletion
       setGalleryToDelete(null); // Clear the gallery to be deleted
@@ -162,7 +167,7 @@ const ViewGallery = () => {
   const handleUpdate = async () => {
     setShowUpdateModal(false); // Close the update modal
     try {
-      const response = await axios.get('/gallery'); // Refresh gallery list
+      const response = await axios.get(`${API_BASE_URL}/gallery`); // Refresh gallery list
       setGalleries(response.data);
     } catch (error) {
       setError('Failed to fetch updated galleries. Please try again later.');
@@ -221,7 +226,7 @@ const ViewGallery = () => {
                           <td>{gallery.pictureId}</td>
                           <td>{gallery.pictureType}</td>
                           <td> 
-                            <img src={`http://localhost:12345/images/${gallery.pictureImage}`} alt={gallery.pictureName || gallery.picturePath} className="product-pic-admin" />
+                            <img src={`${API_BASE_URL}/images/${gallery.pictureImage}`} alt={gallery.pictureName || gallery.picturePath} className="product-pic-admin" />
                           </td>
                           <td>
                             <button

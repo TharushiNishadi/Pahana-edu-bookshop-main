@@ -15,16 +15,16 @@ const AdminOrder = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredOrders, setFilteredOrders] = useState([]);
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
     const fetchUserOrders = async () => {
-    
+      try {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('No token found');
 
-        
-        
-
-        const ordersResponse = await axios.get('/orders', {
+        const ordersResponse = await axios.get(`${API_BASE_URL}/orders`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -41,7 +41,9 @@ const AdminOrder = () => {
 
         setOrders(sortedOrders);
         setFilteredOrders(sortedOrders);
-      
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      }
     }
 
     fetchUserOrders();
@@ -80,7 +82,7 @@ const AdminOrder = () => {
       const token = localStorage.getItem('token');
       if (!token) throw new Error('No token found');
 
-      const response = await axios.put(`/orders/${currentOrderId}/status`, null, {
+      const response = await axios.put(`${API_BASE_URL}/orders/${currentOrderId}/status`, null, {
         params: { orderStatus: statusToUpdate },
         headers: {
           'Authorization': `Bearer ${token}`,

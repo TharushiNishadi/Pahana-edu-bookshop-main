@@ -9,6 +9,9 @@ const Reports = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   const validateDates = () => {
     if (!startDate || !endDate) {
       Swal.fire({
@@ -29,11 +32,9 @@ const Reports = () => {
     if (!validateDates()) return;
 
     try {
-      const formattedStartDate = `${startDate}T00:00:00`;
-      const formattedEndDate = `${endDate}T00:00:00`;
-
-      const response = await axios.get(`/orders/sales-report`, {
-        params: { startDate: formattedStartDate, endDate: formattedEndDate }
+      // Send dates in YYYY-MM-DD format as the backend expects
+      const response = await axios.get(`${API_BASE_URL}/orders/sales-report`, {
+        params: { startDate: startDate, endDate: endDate }
       });
       
       // Display sales report data
@@ -85,11 +86,9 @@ const Reports = () => {
     if (!validateDates()) return;
 
     try {
-      const formattedStartDate = `${startDate}T00:00:00`;
-      const formattedEndDate = `${endDate}T00:00:00`;
-
-      const response = await axios.get(`/orders/financial-report`, {
-        params: { startDate: formattedStartDate, endDate: formattedEndDate }
+      // Send dates in YYYY-MM-DD format as the backend expects
+      const response = await axios.get(`${API_BASE_URL}/orders/financial-report`, {
+        params: { startDate: startDate, endDate: endDate }
       });
       
       // Display financial report data

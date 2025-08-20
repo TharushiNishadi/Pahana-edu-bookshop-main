@@ -16,16 +16,21 @@ const AddUser = () => {
     profilePicture: 'default.jpg'
   });
   const [errors, setErrors] = useState({});
-  const [success] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordVisible, setPasswordVisible] = useState(false);
   const navigate = useNavigate();
+
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
   const validateForm = () => {
     const newErrors = {};
     
     if (!formData.username) {
       newErrors.username = 'Username is required';
+    } else if (formData.username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters long';
     }
 
     if (!formData.email) {
@@ -36,16 +41,12 @@ const AddUser = () => {
 
     if (!formData.phoneNumber) {
       newErrors.phoneNumber = 'Phone number is required';
-    } else if (!/^\d+$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = 'Phone number must be numeric';
+    } else if (!/^\d{10}$/.test(formData.phoneNumber)) {
+      newErrors.phoneNumber = 'Phone number must be exactly 10 digits';
     }
 
     if (!formData.userType) {
       newErrors.userType = 'User type is required';
-    }
-
-    if (formData.userType === 'Staff' && !formData.branch) {
-      newErrors.branch = 'Branch is required for Staff';
     }
 
     if (!formData.password) {
@@ -71,6 +72,18 @@ const AddUser = () => {
     if (validateForm()) {
       setLoading(true);
       
+      // Add timeout to prevent infinite loading
+      const timeoutId = setTimeout(() => {
+        setLoading(false);
+        Swal.fire({
+          title: 'Timeout Error! ⏰',
+          text: 'Request took too long. Please try again or check your connection.',
+          icon: 'warning',
+          timer: 5000,
+          showConfirmButton: true
+        });
+      }, 30000); // 30 seconds timeout
+      
       // Log the form data being sent
       console.log('=== SUBMITTING USER FORM ===');
       console.log('Form data:', formData);
@@ -87,18 +100,49 @@ const AddUser = () => {
       console.log('Data being sent to backend:', userData);
 
       axios
-        .post('/users', userData)
+        .post(`${API_BASE_URL}/users`, userData)
         .then(response => {
+          clearTimeout(timeoutId); // Clear timeout on success
           console.log('User created successfully:', response.data);
-          Swal.fire({
-            title: 'Success!',
-            text: 'User added successfully!',
-            icon: 'success',
-            timer: 2500,
-            showConfirmButton: false
-          }).then(() => {
+          console.log('About to show success notification...');
+          setLoading(false); // Reset loading immediately on success
+          
+          // Set success message in state
+          setSuccess(`User "${formData.username}" added successfully!`);
+          
+          // Show success notification
+          try {
+            Swal.fire({
+              title: 'Success! ✅',
+              text: `User "${formData.username}" added successfully!`,
+              icon: 'success',
+              timer: 3000,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end',
+              showClass: { 
+                popup: 'animate__animated animate__fadeInDown' 
+              },
+              hideClass: { 
+                popup: 'animate__animated animate__fadeOutUp' 
+              }
+            }).then(() => {
+              console.log('Success notification shown, navigating to dashboard...');
+              navigate('/admin-dashboard');
+            }).catch(error => {
+              console.error('Error showing success notification:', error);
+              // Fallback to alert if SweetAlert2 fails
+              alert(`✅ User "${formData.username}" added successfully!`);
+              navigate('/admin-dashboard');
+            });
+          } catch (error) {
+            console.error('Error with SweetAlert2:', error);
+            // Fallback to alert if SweetAlert2 fails
+            alert(`✅ User "${formData.username}" added successfully!`);
             navigate('/admin-dashboard');
-          });
+          }
+          
+          // Reset form data
           setFormData({
             username: '',
             email: '',
@@ -107,24 +151,47 @@ const AddUser = () => {
             password: '',
             profilePicture: 'default.jpg'
           });
+          
+          console.log('Form reset completed');
         })
         .catch(error => {
+          clearTimeout(timeoutId); // Clear timeout on error
           console.error('Error adding user:', error);
           console.error('Error response:', error.response?.data);
           console.error('Error status:', error.response?.status);
           console.error('Error message:', error.message);
           
-          const errorMsg = error.response?.data?.message || error.response?.data?.error || 'Failed to add user';
+          // Reset loading state immediately on error
+          setLoading(false);
+          
+          let errorMsg = 'Failed to add user';
+          
+          if (error.response) {
+            // Backend responded with error
+            const backendError = error.response.data;
+            if (backendError.error) {
+              errorMsg = backendError.error;
+            } else if (backendError.message) {
+              errorMsg = backendError.message;
+            } else {
+              errorMsg = `Server error: ${error.response.status}`;
+            }
+          } else if (error.request) {
+            // Request was made but no response received
+            errorMsg = 'No response from server. Please check if backend is running.';
+          } else {
+            // Something else happened
+            errorMsg = error.message || 'Unknown error occurred';
+          }
+          
+          // Show error message
           Swal.fire({
-            title: 'Error!',
+            title: 'Error! ❌',
             text: errorMsg,
             icon: 'error',
             timer: 5000,
             showConfirmButton: true
           });
-        })
-        .finally(() => {
-          setLoading(false);
         });
     } else {
       console.log('Form validation failed:', errors);
@@ -145,6 +212,19 @@ const AddUser = () => {
           </div>
           Add New User
         </h1>
+        
+        {/* Success Message Display */}
+        {success && (
+          <div className="alert alert-success alert-dismissible fade show" role="alert">
+            <strong>✅ Success!</strong> {success}
+            <button 
+              type="button" 
+              className="btn-close" 
+              onClick={() => setSuccess('')}
+              aria-label="Close"
+            ></button>
+          </div>
+        )}
 
         {loading ? (
           <div className="d-flex flex-column justify-content-center align-items-center" style={{ blockSize: '80vh' }}>
@@ -152,6 +232,22 @@ const AddUser = () => {
               <span className="visually-hidden">Loading...</span>
             </div>
             <p className="mt-3" style={{ color: 'white', fontSize: 20 }}>Adding user. Please wait...</p>
+            <button 
+              type="button" 
+              className="btn btn-warning mt-3"
+              onClick={() => {
+                setLoading(false);
+                Swal.fire({
+                  title: 'Loading Cancelled',
+                  text: 'You can try adding the user again.',
+                  icon: 'info',
+                  timer: 3000,
+                  showConfirmButton: false
+                });
+              }}
+            >
+              Cancel & Try Again
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit}>

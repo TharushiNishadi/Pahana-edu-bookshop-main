@@ -51,7 +51,7 @@ public class FeedbackHandler implements HttpHandler {
     private void handleCreateFeedback(HttpExchange exchange) throws IOException {
         try {
             String requestBody = getRequestBody(exchange);
-            Map<String, Object> feedbackData = JsonUtil.fromJson(requestBody, Map.class);
+          //  Map<String, Object> feedbackData = JsonUtil.fromJson(requestBody, Map.class);
             
             Map<String, Object> response = new HashMap<>();
             response.put("message", "Feedback submitted successfully");

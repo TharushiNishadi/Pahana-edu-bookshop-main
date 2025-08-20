@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
+import com.pahana.backend.utils.JsonUtil;
 
 public class JwtUtil {
     private static final Logger LOGGER = Logger.getLogger(JwtUtil.class.getName());

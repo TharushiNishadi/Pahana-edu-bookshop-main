@@ -23,6 +23,9 @@ const AdminDashboard = () => {
     feedbacks: []
   });
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
     fetchAllData();
   }, []);
@@ -31,13 +34,13 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       const [usersRes, productsRes, categoriesRes, offersRes, galleryRes, ordersRes, feedbacksRes] = await Promise.all([
-        axios.get('/users'),
-        axios.get('/product'),
-        axios.get('/category'),
-        axios.get('/offer'),
-        axios.get('/gallery'),
-        axios.get('/order'),
-        axios.get('/feedback')
+        axios.get(`${API_BASE_URL}/users`),
+        axios.get(`${API_BASE_URL}/product`),
+        axios.get(`${API_BASE_URL}/category`),
+        axios.get(`${API_BASE_URL}/offer`),
+        axios.get(`${API_BASE_URL}/gallery`),
+        axios.get(`${API_BASE_URL}/orders`),
+        axios.get(`${API_BASE_URL}/feedback`)
       ]);
 
       const newData = {
@@ -73,7 +76,8 @@ const AdminDashboard = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(`/reports/sales?startDate=${startDate}&endDate=${endDate}`);
+      // Send dates in YYYY-MM-DD format as the backend expects
+      const response = await axios.get(`${API_BASE_URL}/orders/sales-report?startDate=${startDate}&endDate=${endDate}`);
       
       if (response.data) {
         toast.success('Sales report generated successfully!');
@@ -96,7 +100,8 @@ const AdminDashboard = () => {
 
     try {
       setLoading(true);
-      const response = await axios.get(`/reports/financial?startDate=${startDate}&endDate=${endDate}`);
+      // Send dates in YYYY-MM-DD format as the backend expects
+      const response = await axios.get(`${API_BASE_URL}/orders/financial-report?startDate=${startDate}&endDate=${endDate}`);
       
       if (response.data) {
         toast.success('Financial report generated successfully!');
@@ -125,7 +130,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/users/${userId}`);
+        await axios.delete(`${API_BASE_URL}/users/${userId}`);
         toast.success('User deleted successfully!');
         refreshData();
       } catch (error) {
@@ -148,7 +153,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/product/${productId}`);
+        await axios.delete(`${API_BASE_URL}/product/${productId}`);
         toast.success('Product deleted successfully!');
         refreshData();
       } catch (error) {
@@ -171,7 +176,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/category/${categoryId}`);
+        await axios.delete(`${API_BASE_URL}/category/${categoryId}`);
         toast.success('Category deleted successfully!');
         refreshData();
       } catch (error) {
@@ -194,7 +199,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/offer/${offerId}`);
+        await axios.delete(`${API_BASE_URL}/offer/${offerId}`);
         toast.success('Offer deleted successfully!');
         refreshData();
       } catch (error) {
@@ -217,7 +222,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/gallery/${galleryId}`);
+        await axios.delete(`${API_BASE_URL}/gallery/${galleryId}`);
         toast.success('Gallery item deleted successfully!');
         refreshData();
       } catch (error) {
@@ -240,7 +245,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/feedback/${feedbackId}`);
+        await axios.delete(`${API_BASE_URL}/feedback/${feedbackId}`);
         toast.success('Feedback deleted successfully!');
         refreshData();
       } catch (error) {
@@ -263,7 +268,7 @@ const AdminDashboard = () => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/order/${orderId}`);
+        await axios.delete(`${API_BASE_URL}/order/${orderId}`);
         toast.success('Order deleted successfully!');
         refreshData();
       } catch (error) {

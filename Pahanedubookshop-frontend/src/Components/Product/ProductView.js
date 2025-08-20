@@ -27,10 +27,21 @@ const ProductView = () => {
 
                 const fetchFavoriteProducts = async () => {
                     try {
+                        console.log('Fetching favorites for userId:', userId);
                         const response = await axios.get(`${BACKEND_URL}/api/favorites/list?userId=${userId}`);
+                        console.log('Favorites response:', response.data);
                         setFavorites(new Set(response.data));
                     } catch (error) {
                         console.error('Error fetching favorite products:', error);
+                        if (error.response) {
+                            console.error('Error response:', error.response.data);
+                            console.error('Error status:', error.response.status);
+                        } else if (error.request) {
+                            console.error('No response received:', error.request);
+                        } else {
+                            console.error('Request setup error:', error.message);
+                        }
+                        // Don't show error toast for favorites fetch, just log it
                     }
                 };
 
@@ -92,7 +103,8 @@ const ProductView = () => {
 
     const toggleFavorite = async (productId) => {
         if (!userId) {
-            console.log('User not logged in');
+            toast.error('Please login first to add favorites!');
+            navigate('/login');
             return;
         }
 
@@ -101,16 +113,38 @@ const ProductView = () => {
 
         try {
             if (isFavorite) {
-                await axios.post(`${BACKEND_URL}/api/favorites/remove`, null, { params: { userId, productId } });
+                // Remove from favorites
+                await axios.post(`${BACKEND_URL}/api/favorites/remove`, null, { 
+                    params: { userId, productId } 
+                });
                 newFavorites.delete(productId);
+                toast.success('Product removed from favorites!');
             } else {
-                await axios.post(`${BACKEND_URL}/api/favorites/add`, null, { params: { userId, productId } });
+                // Add to favorites
+                await axios.post(`${BACKEND_URL}/api/favorites/add`, null, { 
+                    params: { userId, productId } 
+                });
                 newFavorites.add(productId);
+                toast.success('Product added to favorites!');
             }
 
             setFavorites(newFavorites);
+            console.log('Favorites updated:', Array.from(newFavorites));
+            
         } catch (error) {
             console.error('Error toggling favorite:', error);
+            
+            if (error.response) {
+                console.error('Error response:', error.response.data);
+                console.error('Error status:', error.response.status);
+                toast.error(`Error: ${error.response.data.error || 'Failed to update favorites'}`);
+            } else if (error.request) {
+                console.error('No response received:', error.request);
+                toast.error('No response from server. Please check if backend is running.');
+            } else {
+                console.error('Request setup error:', error.message);
+                toast.error(`Error: ${error.message}`);
+            }
         }
     };
 

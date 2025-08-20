@@ -19,14 +19,51 @@ const FavoritesPage = () => {
   // Backend base URL
   const BACKEND_URL = 'http://localhost:12345';
 
+  // Check if user is logged in
+  useEffect(() => {
+    if (!user || !userId) {
+      console.log('User not logged in, redirecting to login');
+      toast.error('Please login first to view favorites!');
+      navigate('/login');
+      return;
+    }
+    console.log('User logged in with userId:', userId);
+  }, [user, userId, navigate]);
+
   useEffect(() => {
     const fetchFavoriteProductIds = async () => {
+      if (!userId) {
+        console.log('No userId found, user not logged in');
+        setFavoriteProductIds([]);
+        setFavorites(new Set());
+        return;
+      }
+
       try {
+        console.log('Fetching favorites for userId:', userId);
         const response = await axios.get(`${BACKEND_URL}/api/favorites/list?userId=${userId}`);
-        setFavoriteProductIds(response.data);
-        setFavorites(new Set(response.data));
+        console.log('Favorites response:', response.data);
+        
+        if (response.data && Array.isArray(response.data)) {
+          setFavoriteProductIds(response.data);
+          setFavorites(new Set(response.data));
+        } else {
+          console.warn('Invalid favorites response format:', response.data);
+          setFavoriteProductIds([]);
+          setFavorites(new Set());
+        }
       } catch (error) {
         console.error('Error fetching favorite product IDs:', error);
+        if (error.response) {
+          console.error('Error response:', error.response.data);
+          console.error('Error status:', error.response.status);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Request setup error:', error.message);
+        }
+        setFavoriteProductIds([]);
+        setFavorites(new Set());
       }
     };
 
@@ -35,6 +72,12 @@ const FavoritesPage = () => {
 
   useEffect(() => {
     const fetchProductDetails = async () => {
+      if (favoriteProductIds.length === 0) {
+        console.log('No favorite product IDs to fetch');
+        setProductDetails([]);
+        return;
+      }
+
       try {
         console.log('Fetching product details for IDs:', favoriteProductIds);
         
@@ -55,13 +98,16 @@ const FavoritesPage = () => {
         if (error.response) {
           console.error('Error response:', error.response.data);
           console.error('Error status:', error.response.status);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Request setup error:', error.message);
         }
+        setProductDetails([]);
       }
     };
 
-    if (favoriteProductIds.length > 0) {
-      fetchProductDetails();
-    }
+    fetchProductDetails();
   }, [favoriteProductIds]);
 
   useEffect(() => {
@@ -164,7 +210,7 @@ const FavoritesPage = () => {
             <div className="custom-col" key={product.productId}>
               <div className="custom-card">
                 <img
-                  src={`/images/${product.productImage}`}
+                  src={`${BACKEND_URL}/images/${product.productImage}`}
                   className="custom-card-img-top"
                   alt={product.productName}
                 />

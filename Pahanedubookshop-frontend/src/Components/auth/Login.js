@@ -15,6 +15,9 @@ const Login = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const navigate = useNavigate();
 
+    // Get the API base URL from environment or use default
+    const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
     const validate = () => {
         const errors = {};
         if (!loginData.userEmail) errors.userEmail = "Email is required";
@@ -47,7 +50,10 @@ const Login = () => {
             setLoading(true);
             try {
                 console.log('Sending login request with data:', loginData);
-                const response = await axios.post('/user/login', loginData);
+                console.log('API Base URL:', API_BASE_URL);
+                
+                // Use the full URL with the correct base URL
+                const response = await axios.post(`${API_BASE_URL}/user/login`, loginData);
                 console.log('Login response:', response.data);
                 const { token, user } = response.data;
 
@@ -86,9 +92,20 @@ const Login = () => {
                 setLoginData({ userEmail: '', password: '' });
             } catch (error) {
                 console.error('Error logging in:', error.response ? error.response.data : error.message);
+                console.error('Full error:', error);
+                
+                let errorMessage = 'Invalid Email or Password...Try Again';
+                if (error.response?.status === 500) {
+                    errorMessage = 'Server error. Please try again later.';
+                } else if (error.code === 'ECONNREFUSED') {
+                    errorMessage = 'Cannot connect to server. Please check if the backend is running.';
+                } else if (error.response?.data?.error) {
+                    errorMessage = error.response.data.error;
+                }
+                
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Invalid Email or Password...Try Again',
+                    text: errorMessage,
                     icon: 'error',
                     timer: 2500,
                     showConfirmButton: false,

@@ -6,6 +6,7 @@ import SecFooter from '../footer2';
 import FrtNavigation from "../Navigations/navigation4";
 import SideNavigation from "../Navigations/navigation5";
 import UpdateProductModal from './UpdateProductModal';
+import Swal from 'sweetalert2';
 
 const AdminViewProduct = () => {
   const [products, setProducts] = useState([]);
@@ -18,13 +19,17 @@ const AdminViewProduct = () => {
   const [productToDelete, setProductToDelete] = useState(null);
   const navigate = useNavigate();
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
-    axios.get('/product')
+    axios.get(`${API_BASE_URL}/product`)
       .then(response => {
         setProducts(response.data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching products:', error);
         setError('Failed to fetch products');
         setLoading(false);
       });
@@ -50,16 +55,45 @@ const AdminViewProduct = () => {
 
   const confirmDeleteProduct = () => {
     if (productToDelete) {
-      axios.delete(`/product/${productToDelete.productId}`)
+      axios.delete(`${API_BASE_URL}/product/${productToDelete.productId}`)
         .then(() => {
           setProducts(prevProducts => prevProducts.filter(product => product.productId !== productToDelete.productId));
           setProductToDelete(null);
           setShowDeleteModal(false);
+          
+          // Show success notification
+          Swal.fire({
+            title: 'Success! ✅',
+            text: 'Product deleted successfully!',
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end',
+            showClass: { 
+              popup: 'animate__animated animate__fadeInDown' 
+            },
+            hideClass: { 
+              popup: 'animate__animated animate__fadeOutUp' 
+            }
+          });
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('Error deleting product:', error);
           setError('Failed to delete product');
           setProductToDelete(null);
           setShowDeleteModal(false);
+          
+          // Show error notification
+          Swal.fire({
+            title: 'Error! ❌',
+            text: 'Failed to delete product. Please try again.',
+            icon: 'error',
+            timer: 3000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
         });
     }
   };
@@ -70,11 +104,12 @@ const AdminViewProduct = () => {
   };
 
   const handleModalUpdate = () => {
-    axios.get('/product')
+    axios.get(`${API_BASE_URL}/product`)
       .then(response => {
         setProducts(response.data);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error refreshing products:', error);
         setError('Failed to fetch products');
       });
   };

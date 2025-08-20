@@ -9,16 +9,17 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
   const [productPrice, setProductPrice] = useState(product?.productPrice || '');
   const [productDescription, setProductDescription] = useState(product?.productDescription || '');
   const [productImage, setProductImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(product?.productImage ? `/images/${product?.productImage}` : '');
+  const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [errors, setErrors] = useState({});
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
-    // Use the correct backend URL for API calls
-    const BACKEND_URL = 'http://localhost:12345';
-    
-    axios.get(`${BACKEND_URL}/category`)
+    // Fetch categories
+    axios.get(`${API_BASE_URL}/category`)
       .then(response => {
         setCategories(response.data);
       })
@@ -26,17 +27,19 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
         console.error('Error fetching categories:', error);
       });
 
+    // Update form data when product changes
     if (product) {
-      setProductName(product.productName);
-      setCategoryName(product.categoryName);
-      setProductPrice(product.productPrice);
-      setProductDescription(product.productDescription);
+      setProductName(product.productName || '');
+      setCategoryName(product.categoryName || '');
+      setProductPrice(product.productPrice || '');
+      setProductDescription(product.productDescription || '');
       setProductImage(null);
-      setImagePreview(product.productImage ? `${BACKEND_URL}/images/${product.productImage}` : '');
+      setImagePreview(product.productImage ? `${API_BASE_URL}/images/${product.productImage}` : '');
     }
-  }, [product]);
+  }, [product, API_BASE_URL]);
 
   const handleFileChange = (e) => {
+    console.log('File change event triggered:', e.target.files[0]);
     const file = e.target.files[0];
     setProductImage(file);
 
@@ -53,6 +56,7 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Form submit event triggered');
 
     setErrors({});
 
@@ -84,7 +88,16 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
         formData.append('productImage', productImage);
       }
 
-      await axios.put(`http://localhost:12345/product/${product.productId}`, formData, {
+      console.log('Sending update request to:', `${API_BASE_URL}/product/${product.productId}`);
+      console.log('Form data:', {
+        productName,
+        categoryName,
+        productPrice,
+        productDescription,
+        productImage: productImage ? 'File selected' : 'No file'
+      });
+
+      await axios.put(`${API_BASE_URL}/product/${product.productId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
@@ -146,11 +159,18 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
     }
   };
 
+  const handleCloseModal = () => {
+    console.log('Close modal event triggered');
+    handleClose();
+  };
+
+
+
   if (!show) return null;
 
   return (
     <>
-      <div className="modal-backdrop-blur"></div>
+      <div className="modal-backdrop-blur" onClick={handleCloseModal}></div>
       <div className="modal show" style={{ display: 'block' }}>
         <div className="modal-dialog">
           <div className="modal-content">
@@ -159,7 +179,7 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
               <button
                 type="button"
                 className="btn-close"
-                onClick={handleClose}
+                onClick={handleCloseModal}
               >
                 &times;
               </button>
@@ -218,13 +238,24 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
                 <Form.Group controlId="formProductImage" className="mb-3">
                   <Form.Label>Product Image</Form.Label><br />
                   <div className="image-preview-container">
-                    <input type="file" id="productImage" name="productImage" onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
-                    <label htmlFor="productImage" className={`custom-file-upload ${errors.productImage ? 'is-invalid' : ''}`}>
+                    <input 
+                      type="file" 
+                      id="productImage" 
+                      name="productImage" 
+                      onChange={handleFileChange} 
+                      accept="image/*" 
+                      style={{ display: 'none' }} 
+                    />
+                    <label 
+                      htmlFor="productImage" 
+                      className={`custom-file-upload ${errors.productImage ? 'is-invalid' : ''}`}
+                      style={{ cursor: 'pointer' }}
+                    >
                       Change Image
                     </label>
                     {imagePreview && (
                       <div className="image-preview mt-3">
-                        <img src={imagePreview} alt="Product Preview" style={{ inlineSize: '200px' }} />
+                        <img src={imagePreview} alt="Product Preview" style={{ maxWidth: '200px', maxHeight: '200px' }} />
                       </div>
                     )}
                     {errors.productImage && <div className="invalid-feedback">{errors.productImage}</div>}
@@ -232,37 +263,11 @@ const UpdateProductModal = ({ show, handleClose, product, onUpdate }) => {
                 </Form.Group>
                 <br />
                 <div className="modal-footer">
-                  <Button variant="secondary" onClick={handleClose} className="btn btn-secondary">Close</Button>
-                  <Button variant="primary" type="submit" className="btn btn-danger" disabled={loading}>
-                    {loading ? 'Updating...' : 'Update'}
+                  <Button variant="secondary" onClick={handleCloseModal} className="btn btn-secondary">
+                    Close
                   </Button>
-                  <Button 
-                    variant="outline-warning" 
-                    type="button" 
-                    className="btn btn-outline-warning ms-2"
-                    onClick={() => {
-                      console.log('=== DEBUG PRODUCT UPDATE ===');
-                      console.log('Product ID:', product?.productId);
-                      console.log('Current form data:');
-                      console.log('- productName:', productName);
-                      console.log('- categoryName:', categoryName);
-                      console.log('- productPrice:', productPrice);
-                      console.log('- productDescription:', productDescription);
-                      console.log('- productImage:', productImage);
-                      
-                      // Test the backend endpoint
-                      axios.get(`/test-product-db`)
-                        .then(response => {
-                          console.log('Database test result:', response.data);
-                          alert('Check console for debug info and database test results');
-                        })
-                        .catch(error => {
-                          console.error('Database test failed:', error);
-                          alert('Database test failed! Check console for details.');
-                        });
-                    }}
-                  >
-                    Debug Update
+                  <Button variant="warning" type="submit" className="btn btn-warning" disabled={loading}>
+                    {loading ? 'Updating...' : 'Update'}
                   </Button>
                 </div>
               </Form>

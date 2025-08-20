@@ -8,18 +8,21 @@ const UpdateGalleryModal = ({ show, handleClose, gallery, onUpdate }) => {
   const [pictureId, setPictureId] = useState(gallery?.pictureId || '');
   const [pictureType, setPictureType] = useState(gallery?.pictureType || '');
   const [picturePath, setPicturePath] = useState(null);
-  const [imagePreview, setImagePreview] = useState(gallery?.pictureImage ? `http://localhost:12345/images/${gallery.pictureImage}` : '');
+  const [imagePreview, setImagePreview] = useState('');
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
   useEffect(() => {
     if (gallery) {
       setPictureId(gallery.pictureId);
       setPictureType(gallery.pictureType);
-      setImagePreview(gallery.pictureImage ? `http://localhost:12345/images/${gallery.pictureImage}` : '');
+      setImagePreview(gallery.pictureImage ? `${API_BASE_URL}/images/${gallery.pictureImage}` : '');
       setPicturePath(null);
     }
-  }, [gallery]);
+  }, [gallery, API_BASE_URL]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -89,7 +92,7 @@ const UpdateGalleryModal = ({ show, handleClose, gallery, onUpdate }) => {
         console.log(`  ${key}: ${value}`);
       }
 
-      await axios.put(`/gallery/${gallery.pictureId}`, formData, {
+      await axios.put(`${API_BASE_URL}/gallery/${gallery.pictureId}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }

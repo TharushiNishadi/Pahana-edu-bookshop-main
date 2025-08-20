@@ -28,6 +28,16 @@ const AddBranch = () => {
             newErrors.branchAddress = 'Branch Address is required';
         }
 
+        // Validate phone number if provided
+        if (formData.branchPhone && !/^\d{10}$/.test(formData.branchPhone)) {
+            newErrors.branchPhone = 'Phone number must be exactly 10 digits';
+        }
+
+        // Validate email if provided
+        if (formData.branchEmail && !/\S+@\S+\.\S+/.test(formData.branchEmail)) {
+            newErrors.branchEmail = 'Please enter a valid email address';
+        }
+
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -159,13 +169,14 @@ const AddBranch = () => {
                             <div className="col-sm-10">
                                 <input
                                     type="tel"
-                                    className="form-control"
+                                    className={`form-control ${errors.branchPhone ? 'is-invalid' : ''}`}
                                     id="branchPhone"
                                     name="branchPhone"
                                     value={formData.branchPhone}
                                     onChange={handleChange}
                                     placeholder="Enter branch phone number (optional)"
                                 />
+                                {errors.branchPhone && <div className="invalid-feedback">{errors.branchPhone}</div>}
                             </div>
                         </div>
 
@@ -174,13 +185,14 @@ const AddBranch = () => {
                             <div className="col-sm-10">
                                 <input
                                     type="email"
-                                    className="form-control"
+                                    className={`form-control ${errors.branchEmail ? 'is-invalid' : ''}`}
                                     id="branchEmail"
                                     name="branchEmail"
                                     value={formData.branchEmail}
                                     onChange={handleChange}
                                     placeholder="Enter branch email (optional)"
                                 />
+                                {errors.branchEmail && <div className="invalid-feedback">{errors.branchEmail}</div>}
                             </div>
                         </div>
 

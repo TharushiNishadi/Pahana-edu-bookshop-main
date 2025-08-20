@@ -18,13 +18,17 @@ const ViewCategory = () => {
   const [categoryToDelete, setCategoryToDelete] = useState(null);
   const navigate = useNavigate();
 
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
+
   useEffect(() => {
-    axios.get('/category')
+    axios.get(`${API_BASE_URL}/category`)
       .then(response => {
         setCategories(response.data);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error fetching categories:', error);
         setError('Failed to fetch categories');
         setLoading(false);
       });
@@ -50,23 +54,25 @@ const ViewCategory = () => {
 
   const confirmDeleteCategory = () => {
     if (categoryToDelete) {
-      axios.delete(`/category/${categoryToDelete.categoryId}`)
+      axios.delete(`${API_BASE_URL}/category/${categoryToDelete.categoryId}`)
         .then(() => {
           setCategories(prevCategories => prevCategories.filter(category => category.categoryId !== categoryToDelete.categoryId));
           setShowDeleteModal(false);
         })
-        .catch(() => {
+        .catch((error) => {
+          console.error('Error deleting category:', error);
           setError('Failed to delete category');
         });
     }
   };
 
   const handleModalUpdate = () => {
-    axios.get('/category')
+    axios.get(`${API_BASE_URL}/category`)
       .then(response => {
         setCategories(response.data);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error('Error refreshing categories:', error);
         setError('Failed to fetch categories');
       });
   };

@@ -5,12 +5,19 @@ import { Button, Form } from 'react-bootstrap';
 const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
   const [branchName, setBranchName] = useState(branch?.branchName || '');
   const [branchAddress, setBranchAddress] = useState(branch?.branchAddress || '');
+  const [branchPhone, setBranchPhone] = useState(branch?.branchPhone || '');
+  const [branchEmail, setBranchEmail] = useState(branch?.branchEmail || '');
   const [loading, setLoading] = useState(false);
+  
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
   useEffect(() => {
     if (branch) {
       setBranchName(branch.branchName);
       setBranchAddress(branch.branchAddress);
+      setBranchPhone(branch.branchPhone || '');
+      setBranchEmail(branch.branchEmail || '');
     }
   }, [branch]);
 
@@ -27,12 +34,26 @@ const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
       return;
     }
 
+    // Validate phone number if provided
+    if (branchPhone && !/^\d{10}$/.test(branchPhone)) {
+      alert('Phone number must be exactly 10 digits.');
+      return;
+    }
+
+    // Validate email if provided
+    if (branchEmail && !/\S+@\S+\.\S+/.test(branchEmail)) {
+      alert('Please enter a valid email address.');
+      return;
+    }
+
     setLoading(true);
 
     try {
-      await axios.put(`http://localhost:12345/branch/${branch.branchId}`, {
+      await axios.put(`${API_BASE_URL}/branch/${branch.branchId}`, {
         branchName,
         branchAddress,
+        branchPhone,
+        branchEmail,
       });
       onUpdate();
       handleClose();
@@ -81,6 +102,26 @@ const UpdateBranchModal = ({ show, handleClose, branch, onUpdate }) => {
                     value={branchAddress}
                     onChange={(e) => setBranchAddress(e.target.value)}
                     required
+                  />
+                </Form.Group>
+                <br />
+                <Form.Group controlId="formBranchPhone">
+                  <Form.Label>Branch Phone</Form.Label>
+                  <Form.Control
+                    type="tel"
+                    value={branchPhone}
+                    onChange={(e) => setBranchPhone(e.target.value)}
+                    placeholder="Enter phone number"
+                  />
+                </Form.Group>
+                <br />
+                <Form.Group controlId="formBranchEmail">
+                  <Form.Label>Branch Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    value={branchEmail}
+                    onChange={(e) => setBranchEmail(e.target.value)}
+                    placeholder="Enter email address"
                   />
                 </Form.Group>
                 <br />

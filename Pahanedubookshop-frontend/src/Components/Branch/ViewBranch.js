@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import '../../CSS/Profile.css';
-import SecFooter from "../footer2";
+import SecFooter from '../footer2';
 import FrtNavigation from "../Navigations/navigation4";
 import SideNavigation from "../Navigations/navigation5";
 import UpdateBranchModal from './UpdateBranchModal';
@@ -12,12 +12,15 @@ const ViewBranch = () => {
   const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedBranch, setSelectedBranch] = useState(null);
+  const [showModal, setShowModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [branchToDelete, setBranchToDelete] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [showModal, setShowModal] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState(null);
   const navigate = useNavigate();
+
+  // Get the API base URL from environment or use default
+  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:12345';
 
   useEffect(() => {
     fetchBranches();
@@ -25,7 +28,7 @@ const ViewBranch = () => {
 
   const fetchBranches = () => {
     setLoading(true);
-    axios.get('http://localhost:12345/branch')
+    axios.get(`${API_BASE_URL}/branch`)
       .then(response => {
         setBranches(response.data);
         setLoading(false);
@@ -58,7 +61,7 @@ const ViewBranch = () => {
     const branchToDeleteData = branches.find(b => b.branchId === branchToDelete);
     const branchName = branchToDeleteData ? branchToDeleteData.branchName : 'Unknown';
 
-    axios.delete(`http://localhost:12345/branch/${branchToDelete}`)
+    axios.delete(`${API_BASE_URL}/branch/${branchToDelete}`)
       .then(() => {
         setBranches(prevBranches => prevBranches.filter(branch => branch.branchId !== branchToDelete));
         setShowDeleteModal(false);
@@ -109,7 +112,7 @@ const ViewBranch = () => {
 
   const handleUpdateBranch = () => {
     axios
-      .get('http://localhost:12345/branch')
+      .get(`${API_BASE_URL}/branch`)
       .then((response) => {
         setBranches(response.data);
         setShowModal(false);
@@ -199,13 +202,6 @@ const ViewBranch = () => {
                   )}
                 </div>
                 <div className="button-container">
-                  <button 
-                    className="btn btn-outline-primary me-2" 
-                    onClick={fetchBranches}
-                    title="Refresh branches"
-                  >
-                    <i className="bi bi-arrow-clockwise"></i> Refresh
-                  </button>
                   <button className="btn-gold-add" onClick={handleAddBranch}>
                     <i className="bi bi-plus-circle"></i> Add Branch
                   </button>

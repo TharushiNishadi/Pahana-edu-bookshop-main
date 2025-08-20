@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Add User Issue</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f0f0f0; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        button { background: #007bff; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer; margin: 10px; }
+        button:hover { background: #0056b3; }
+        .success-btn { background: #28a745; }
+        .danger-btn { background: #dc3545; }
+        .result { margin: 20px 0; padding: 15px; border-radius: 5px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        .warning { background: #fff3cd; color: #856404; }
+        input, select { padding: 10px; margin: 10px; border: 1px solid #ddd; border-radius: 5px; width: 200px; }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Add User Issue</h1>
+        <p>Let's debug why adding users is not working step by step.</p>
+        
+        <h3>Step 1: Check Backend Connection</h3>
+        <button onclick="testBackend()">🔌 Test Backend</button>
+        
+        <h3>Step 2: Check Users Table</h3>
+        <button onclick="checkUsersTable()">📋 Check Users Table</button>
+        
+        <h3>Step 3: Test Create User API</h3>
+        <button onclick="testCreateUserAPI()">👤 Test Create User</button>
+        
+        <h3>Step 4: Add Test User</h3>
+        <div class="form-group">
+            <label for="testUsername">Username:</label>
+            <input type="text" id="testUsername" value="testuser" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+            <label for="testEmail">Email:</label>
+            <input type="email" id="testEmail" value="test@example.com" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="testPhone">Phone Number:</label>
+            <input type="text" id="testPhone" value="0771234567" placeholder="Enter phone">
+        </div>
+        <div class="form-group">
+            <label for="testUserType">User Type:</label>
+            <select id="testUserType">
+                <option value="Customer">Customer</option>
+                <option value="Staff">Staff</option>
+                <option value="Admin">Admin</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="testPassword">Password:</label>
+            <input type="password" id="testPassword" value="test123" placeholder="Enter password">
+        </div>
+        <button onclick="addTestUser()" class="success-btn">➕ Add Test User</button>
+        
+        <h3>Step 5: Check Database Structure</h3>
+        <button onclick="checkDatabaseStructure()">🗄️ Check Database</button>
+        
+        <div id="result" class="result info">Click a button to start debugging...</div>
+    </div>
+
+    <script>
+        const BACKEND_URL = 'http://localhost:12345';
+        
+        function showResult(message, type = 'info') {
+            document.getElementById('result').textContent = message;
+            document.getElementById('result').className = `result ${type}`;
+        }
+        
+        async function testBackend() {
+            try {
+                showResult('🔄 Testing backend connection...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-users-db`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult(`✅ Backend connected!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Backend failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Connection error: ${error.message}\n\nBackend not running on port 12345!`, 'error');
+            }
+        }
+        
+        async function checkUsersTable() {
+            try {
+                showResult('🔄 Checking users table...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/users`);
+                
+                if (response.ok) {
+                    const users = await response.json();
+                    showResult(`✅ Users table accessible!\n\nTotal users: ${users.length}\n\nUsers: ${JSON.stringify(users, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Users table check failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testCreateUserAPI() {
+            try {
+                showResult('🔄 Testing create user API endpoint...', 'info');
+                
+                const testData = {
+                    username: 'apitest',
+                    email: 'apitest@example.com',
+                    phoneNumber: '0771234567',
+                    userType: 'Customer',
+                    password: 'test123',
+                    profilePicture: 'default.jpg'
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult(`✅ Create user API working!\n\nResponse: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Create user API failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function addTestUser() {
+            try {
+                const username = document.getElementById('testUsername').value;
+                const email = document.getElementById('testEmail').value;
+                const phoneNumber = document.getElementById('testPhone').value;
+                const userType = document.getElementById('testUserType').value;
+                const password = document.getElementById('testPassword').value;
+                
+                if (!username || !email || !phoneNumber || !userType || !password) {
+                    showResult('❌ Please fill all fields!', 'error');
+                    return;
+                }
+                
+                showResult(`🔄 Adding test user: ${username}`, 'info');
+                
+                const userData = {
+                    username: username,
+                    email: email,
+                    phoneNumber: phoneNumber,
+                    userType: userType,
+                    password: password,
+                    profilePicture: 'default.jpg'
+                };
+                
+                const response = await fetch(`${BACKEND_URL}/users`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showResult(`✅ Test user added successfully! 🎉\n\nResponse: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Failed to add test user: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function checkDatabaseStructure() {
+            try {
+                showResult('🔄 Checking database structure...', 'info');
+                
+                const response = await fetch(`${BACKEND_URL}/test-users-db`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.database && data.database.includes('Connected successfully')) {
+                        showResult(`✅ Database connected!\n\nUsers count: ${data.usersCount || 'Unknown'}\n\nFull response: ${JSON.stringify(data, null, 2)}`, 'success');
+                    } else {
+                        showResult(`⚠️ Database issue: ${data.database || 'Unknown'}\n\nFull response: ${JSON.stringify(data, null, 2)}`, 'warning');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    showResult(`❌ Database check failed: ${response.status} ${response.statusText}\n\nError: ${errorText}`, 'error');
+                }
+            } catch (error) {
+                showResult(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

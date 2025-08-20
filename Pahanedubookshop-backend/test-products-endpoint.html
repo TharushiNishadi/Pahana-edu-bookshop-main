@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products Endpoint Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Products Endpoint Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Products Endpoint</h2>
+        <button onclick="testProductsEndpoint()">Test GET /product</button>
+        <div id="productsResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Product Database</h2>
+        <button onclick="testProductDatabase()">Test Product Database</button>
+        <div id="dbResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Create Product</h2>
+        <button onclick="testCreateProduct()">Test POST /product</button>
+        <div id="createResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:12345';
+
+        function showResult(elementId, message, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.className = `result ${type}`;
+        }
+
+        async function testProductsEndpoint() {
+            try {
+                showResult('productsResult', 'Testing products endpoint...', 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/product`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('productsResult', `✅ Products endpoint working!\n\nFound ${data.length} products:\n\n${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    showResult('productsResult', `❌ Products endpoint failed: ${response.status}\n\nError: ${errorData.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult('productsResult', `❌ Products endpoint test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testProductDatabase() {
+            try {
+                showResult('dbResult', 'Testing product database...', 'info');
+                
+                const response = await fetch(`${API_BASE_URL}/test-product-db`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('dbResult', `✅ Product database test successful!\n\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    showResult('dbResult', `❌ Product database test failed: ${response.status}\n\nError: ${errorData.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult('dbResult', `❌ Product database test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateProduct() {
+            try {
+                showResult('createResult', 'Testing product creation...', 'info');
+                
+                const testProduct = {
+                    productName: 'Test Product',
+                    categoryName: 'Test Category',
+                    productPrice: 99.99,
+                    productDescription: 'This is a test product',
+                    productImage: 'test-image.jpg'
+                };
+                
+                const response = await fetch(`${API_BASE_URL}/product`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testProduct)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showResult('createResult', `✅ Product creation successful!\n\nCreated product: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    const errorData = await response.json();
+                    showResult('createResult', `❌ Product creation failed: ${response.status}\n\nError: ${errorData.error || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                showResult('createResult', `❌ Product creation test failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Auto-test on page load
+        window.onload = function() {
+            testProductsEndpoint();
+        };
+    </script>
+</body>
+</html>
