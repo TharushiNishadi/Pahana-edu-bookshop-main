@@ -22,11 +22,9 @@ const Navigation = () => {
                             <Link className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} to="/">Home</Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/menu' ? 'active' : ''}`} to="/menu">Categories</Link>
+                            <Link className={`nav-link ${location.pathname === '/menu' ? 'active' : ''}`} to="/menu">Menu</Link>
                         </li>
-                        {/* <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/reservation' ? 'active' : ''}`} to="/reservation">Reservation</Link>
-                        </li> */}
+                        
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/gallery' ? 'active' : ''}`} to="/gallery">Gallery</Link>
                         </li>
