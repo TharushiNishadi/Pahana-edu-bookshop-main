@@ -741,6 +741,7 @@ public class ProductHandler implements HttpHandler {
                             try (ResultSet schemaRs = stmt.executeQuery("PRAGMA table_info(products)")) {
                                 while (schemaRs.next()) {
                                     Map<String, Object> column = new HashMap<>();
+
                                     column.put("name", schemaRs.getString("name"));
                                     column.put("type", schemaRs.getString("type"));
                                     column.put("notNull", schemaRs.getInt("notnull"));
