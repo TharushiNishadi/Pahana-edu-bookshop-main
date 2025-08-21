@@ -193,7 +193,7 @@ const UserManagement = () => {
                                                     alt="Profile"
                                                     className="user-avatar"
                                                     onError={(e) => {
-                                                        e.target.src = '/images/default.jpg';
+                                                        e.target.src = '/images/default.jpg/';
                                                     }}
                                                 />
                                             </td>

@@ -24,9 +24,7 @@ const Footer = () => {
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/menu' ? 'active-link' : ''}`} to="/menu">Menu</Link>
                         </li>
-                        {/* <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/reservation' ? 'active-link' : ''}`} to="/reservation">Reservation</Link>
-                        </li> */}
+                        
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/gallery' ? 'active-link' : ''}`} to="/gallery">Gallery</Link>
                         </li>
