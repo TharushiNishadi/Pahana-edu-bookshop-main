@@ -57,18 +57,13 @@ const SideNavigation = () => {
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-category' ? 'active' : ''}`} to="/view-category">Category</Link>
                     </li>
-                    <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/reports' ? 'active' : ''}`} to="/reports">Reports</Link>
-                    </li>
+                    
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-offer' ? 'active' : ''}`} to="/view-offer">Offers</Link>
                     </li>
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/view-gallery' ? 'active' : ''}`} to="/view-gallery">Gallery</Link>
                     </li>
-                    {/* <li className="nav-item">
-                        <Link className={`nav-link ${location.pathname === '/admin-reservation' ? 'active' : ''}`} to="/admin-reservation">Reservation</Link>
-                    </li> */}
                     <li className="nav-item">
                         <Link className={`nav-link ${location.pathname === '/admin-feedback' ? 'active' : ''}`} to="/admin-feedback">Feedbacks</Link>
                     </li>
