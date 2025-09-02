@@ -227,7 +227,7 @@ const StaffDashboard = () => {
                     onClick={() => setShowModal(false)}
                   >
                     No
-                  </>
+                  </button>
                   <button
                     type="button"
                     className="btn btn-danger"
