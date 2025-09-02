@@ -22,7 +22,7 @@ public class DatabaseConfig {
             insertSampleData();
             
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error i", e);
+            LOGGER.log(Level.SEVERE, "Error initializing database", e);
             throw new RuntimeException("Failed to initialize database", e);
         }
     }
