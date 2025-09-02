@@ -13,7 +13,7 @@ public class DatabaseConfig {
         try {
             // Create database connection
             connection = DriverManager.getConnection(DB_URL);
-            LOGGER.info("Database connection established successfully");
+            LOGGER.info(" established successfully");
 
             // Create tables
             createTables();
