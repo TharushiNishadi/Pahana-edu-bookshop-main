@@ -246,7 +246,7 @@ const Checkout = () => {
       console.log('Charges calculation:', {
         originalAmount: amount,
         safeAmount,
-        offerValue,
+      ,
         discount,
         tax,
         deliveryCharge,
