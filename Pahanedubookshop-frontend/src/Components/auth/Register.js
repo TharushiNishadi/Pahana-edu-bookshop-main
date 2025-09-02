@@ -58,7 +58,7 @@ const Register = () => {
             axios.post('user/register', { ...register, userType: 'Customer' })
                 .then(response => {
                     Swal.fire({
-                        title: 'Success!',
+                        title: '!',
                         text: 'Registration successful! Redirecting to login...',
                         icon: 'success',
                         timer: 2500,
