@@ -27,7 +27,12 @@ public class AuthHandler implements HttpHandler {
             String method = exchange.getRequestMethod();
 
             // Set CORS headers
-            se
+            setCorsHeaders(exchange);
+
+            if ("OPTIONS".equals(method)) {
+                exchange.sendResponseHeaders(200, -1);
+                return;
+            }
 
             switch (path) {
                 case "/user/login":
