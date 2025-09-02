@@ -76,11 +76,7 @@ const AddUser = () => {
       const timeoutId = setTimeout(() => {
         setLoading(false);
         Swal.fire({
-          title: 'Timeout Error! ⏰',
-          text: 'Request took too long. Please try again or check your connection.',
-          icon: 'warning',
-          timer: 5000,
-          showConfirmButton: true
+          
         });
       }, 30000); // 30 seconds timeout
       
