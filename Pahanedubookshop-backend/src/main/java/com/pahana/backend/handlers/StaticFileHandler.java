@@ -36,6 +36,7 @@ public class StaticFileHandler implements HttpHandler {
         LOGGER.info("Query: " + exchange.getRequestURI().getQuery());
         
         if ("/".equals(path)) {
+    
             // Return a simple welcome message
             String response = "Pahana Edu Bookshop Backend API is running!\n\n" +
                             "Available endpoints:\n" +
