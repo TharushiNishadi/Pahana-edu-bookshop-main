@@ -69,7 +69,8 @@ const AddUser = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    
+    if (validateForm()) {
+      setLoading(true);
       
       // Add timeout to prevent infinite loading
       const timeoutId = setTimeout(() => {
