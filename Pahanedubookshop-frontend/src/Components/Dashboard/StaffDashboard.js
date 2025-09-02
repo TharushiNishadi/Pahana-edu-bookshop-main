@@ -116,7 +116,7 @@ const StaffDashboard = () => {
     <div>
       <TrdNavigation />
       <h1 className="form-head-one">
-        <span>{userBranch} Reservations</span>
+        <span>{userBranch} StaffDashboard </span>
       </h1>
       
       <div className="search-container-one">
@@ -208,7 +208,7 @@ const StaffDashboard = () => {
             <div className="modal-dialog">
               <div className="modal-content">
                 <div className="modal-header">
-                  <h5 className="modal-title">Reservation Confirmation</h5>
+                  <h5 className="modal-title">Confirmation</h5>
                   <button
                     type="button"
                     className="btn-close"
@@ -218,7 +218,7 @@ const StaffDashboard = () => {
                   </button>
                 </div>
                 <div className="modal-body">
-                  <p>Are you sure you want to {statusToUpdate} this reservation?</p>
+                  <p>Are you sure you want to {statusToUpdate} this?</p>
                 </div>
                 <div className="modal-footer">
                   <button
