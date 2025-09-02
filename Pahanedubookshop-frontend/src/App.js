@@ -54,7 +54,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="*" element={<Index />} />
+        <Route path="*" ={<Index />} />
         <Route path="/forget-password-1" element={<ForgetPw1 />} />
         <Route path="/forget-password-2" element={<ForgetPw2 />} />
         <Route path="/reset-pw" element={<ResetPw />} />
