@@ -38,7 +38,7 @@ public class DatabaseConfig {
                 phoneNumber TEXT,
                 userType TEXT NOT NULL,
                 branch TEXT,
-                profilePicture TEXT,
+                prof,
                 createdAt TEXT NOT NULL,
                 updatedAt TEXT NOT NULL
             )
